@@ -18,7 +18,7 @@ steps:
     node-version: '18.19.1'
     cache: 'npm'
     cache-dependency-path: |
-      package-lock.json
+      backend/package-lock.json
       frontend/package-lock.json
 
     
@@ -52,8 +52,8 @@ steps:
     username: ${{ secrets.SERVER_USER }}
     password: ${{ secrets.SERVER_PASSWORD }}
     port: ${{ secrets.SERVER_PORT }}
-    source: "backend/*,package.json,package-lock.json"
-    target: "/var/cardsServer"
+    source: "backend/*"
+    target: "/var/big-project-server"
     overwrite: true
 
 # Install backend dependencies and restart PM2
@@ -66,7 +66,7 @@ steps:
     port: ${{ secrets.SERVER_PORT }}
     script: |
       # Navigate to backend directory
-      cd /var/cardsServer
+      cd /var/big-project-server
       
       # Install dependencies
       npm ci --production
