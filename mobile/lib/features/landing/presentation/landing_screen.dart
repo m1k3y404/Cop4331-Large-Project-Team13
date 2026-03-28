@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/router/app_router.dart';
 import '../../../shared/widgets/top_bar.dart';
 
 class LandingScreen extends StatefulWidget {
@@ -18,6 +19,14 @@ class _LandingScreenState extends State<LandingScreen> {
     setState(() {
       _isLoggedIn = true;
     });
+  }
+
+  void _handleStartWriting() {
+    if (!_isLoggedIn) {
+      _handleLogin();
+    }
+
+    Navigator.of(context).pushNamed(AppRouter.writingRoute);
   }
 
   @override
@@ -61,7 +70,10 @@ class _LandingScreenState extends State<LandingScreen> {
                                           32) /
                                       2
                                 : double.infinity,
-                            child: _HeroSection(theme: theme),
+                            child: _HeroSection(
+                              theme: theme,
+                              onStartWritingPressed: _handleStartWriting,
+                            ),
                           ),
                           SizedBox(
                             width: isWide
@@ -87,9 +99,13 @@ class _LandingScreenState extends State<LandingScreen> {
 }
 
 class _HeroSection extends StatelessWidget {
-  const _HeroSection({required this.theme});
+  const _HeroSection({
+    required this.theme,
+    required this.onStartWritingPressed,
+  });
 
   final ThemeData theme;
+  final VoidCallback onStartWritingPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -127,8 +143,8 @@ class _HeroSection extends StatelessWidget {
           runSpacing: 12,
           children: [
             ElevatedButton(
-              onPressed: () {},
-              child: const Text('Start reading'),
+              onPressed: onStartWritingPressed,
+              child: const Text('Start writing'),
             ),
             OutlinedButton(
               onPressed: null,
