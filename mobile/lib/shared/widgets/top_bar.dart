@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 
 class TopBar extends StatelessWidget {
-  const TopBar({super.key});
+  const TopBar({
+    super.key,
+    required this.isLoggedIn,
+    required this.username,
+    required this.onLoginPressed,
+  });
+
+  final bool isLoggedIn;
+  final String username;
+  final VoidCallback onLoginPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +36,17 @@ class TopBar extends StatelessWidget {
             ],
           ),
         ),
-        TextButton(onPressed: () {}, child: const Text('Login')),
+        if (isLoggedIn)
+          Text(
+            'Welcome $username',
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1F1A17),
+            ),
+          )
+        else
+          TextButton(onPressed: onLoginPressed, child: const Text('Login')),
       ],
     );
   }

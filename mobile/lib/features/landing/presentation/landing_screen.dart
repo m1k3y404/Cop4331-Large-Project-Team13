@@ -2,8 +2,23 @@ import 'package:flutter/material.dart';
 
 import '../../../shared/widgets/top_bar.dart';
 
-class LandingScreen extends StatelessWidget {
+class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
+
+  @override
+  State<LandingScreen> createState() => _LandingScreenState();
+}
+
+class _LandingScreenState extends State<LandingScreen> {
+  static const String _username = 'user';
+
+  bool _isLoggedIn = false;
+
+  void _handleLogin() {
+    setState(() {
+      _isLoggedIn = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +43,11 @@ class LandingScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const TopBar(),
+                      TopBar(
+                        isLoggedIn: _isLoggedIn,
+                        username: _username,
+                        onLoginPressed: _handleLogin,
+                      ),
                       SizedBox(height: verticalSpacing),
                       Wrap(
                         spacing: 32,
