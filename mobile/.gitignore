@@ -1,0 +1,92 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+# Android/Gradle
+.gradle/
+/android/local.properties
+/android/.gradle/
+/android/app/*.keystore
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+
+# Xcode
+DerivedData/
+*.xcworkspace
+*.xcuserdata
+*.xcuserstate
+
+# IDEs
+.vscode/
+.idea/
+
+# Flutter/Dart generated
+.packages
+/.flutter-plugins
+/.flutter-plugins-dependencies
+pubspec.lock
+
+# Build outputs
+/build/
+/ios/Flutter/ephemeral/
+/macos/Flutter/ephemeral/
+/linux/flutter/
+/windows/flutter/
+
+# If you truly want to ignore the platform folders entirely (not usually recommended),
+# uncomment the following lines. Note: ignoring these means native project files won't be
+# present in the repo for collaborators or CI, and some tools expect them to be versioned.
+#
+# android/
+# ios/
+# macos/
+# linux/
+# windows/
+web/
