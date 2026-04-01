@@ -1,0 +1,198 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Team 13 Blog API",
+    "version": "1.0.0",
+    "description": "COP4331 Large Project - Spring 2026"
+  },
+  "servers": [
+    { "url": "http://159.223.183.35:5000" },
+    { "url": "http://localhost:5000" }
+  ],
+  "paths": {
+    "/api/posts": {
+      "get": {
+        "summary": "Get all posts",
+        "responses": {
+          "200": { "description": "Array of posts" }
+        }
+      },
+      "post": {
+        "summary": "Create a post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "content": { "type": "string" },
+                  "creator": { "type": "string" }
+                },
+                "required": ["title", "content", "creator"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Post created" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/api/posts/search": {
+      "get": {
+        "summary": "Search posts",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Matching posts" }
+        }
+      }
+    },
+    "/api/posts/user/{username}": {
+      "get": {
+        "summary": "Get posts by user",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Posts by user" }
+        }
+      }
+    },
+    "/api/posts/{id}": {
+      "get": {
+        "summary": "Get a single post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Post object" },
+          "404": { "description": "Not found" }
+        }
+      },
+      "put": {
+        "summary": "Edit a post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "content": { "type": "string" },
+                  "creator": { "type": "string" }
+                },
+                "required": ["title", "content", "creator"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Updated post" },
+          "403": { "description": "Not authorized" },
+          "404": { "description": "Not found" }
+        }
+      },
+      "delete": {
+        "summary": "Delete a post",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Deleted" },
+          "404": { "description": "Not found" }
+        }
+      }
+    },
+    "/api/comments": {
+      "post": {
+        "summary": "Add a comment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "postId": { "type": "string" },
+                  "creator": { "type": "string" },
+                  "content": { "type": "string" }
+                },
+                "required": ["postId", "creator", "content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Comment created" }
+        }
+      }
+    },
+    "/api/comments/{postId}": {
+      "get": {
+        "summary": "Get comments for a post",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Array of comments" }
+        }
+      }
+    },
+    "/api/comments/{id}": {
+      "delete": {
+        "summary": "Delete a comment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Deleted" },
+          "404": { "description": "Not found" }
+        }
+      }
+    }
+  }
+}
