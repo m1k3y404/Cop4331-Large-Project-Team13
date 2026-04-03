@@ -1,7 +1,7 @@
 import { Button, Form, Input, Layout, message, Typography } from "antd";
 import { Content } from "antd/es/layout/layout";
 import { useCallback } from "react";
-import { redirect, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 export function Register() {
     return (
