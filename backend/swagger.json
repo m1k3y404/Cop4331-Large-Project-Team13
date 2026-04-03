@@ -3,22 +3,87 @@
   "info": {
     "title": "Team 13 Blog API",
     "version": "1.0.0",
-    "description": "COP4331 Large Project - Spring 2026"
+    "description": "COP4331 Large Project - Spring 2026. All IDs are MongoDB ObjectIds (24-character hex strings). The 'creator' field is the username of the user making the request."
   },
   "servers": [
     { "url": "http://159.223.183.35:5000" },
     { "url": "http://localhost:5000" }
   ],
+  "components": {
+    "schemas": {
+      "Post": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "663f1a2b4e12a84f5c9d0e7a", "description": "MongoDB ObjectId" },
+          "title": { "type": "string", "example": "My First Blog Post" },
+          "content": { "type": "string", "example": "This is the body of the blog post." },
+          "creator": { "type": "string", "example": "johndoe", "description": "Username of the post author" },
+          "tags": { "type": "array", "items": { "type": "string" }, "example": ["blog", "first", "post"], "description": "Auto-generated from title and content" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "663f1b3c5f23b95g6d0e1f8b", "description": "MongoDB ObjectId" },
+          "postId": { "type": "string", "example": "663f1a2b4e12a84f5c9d0e7a", "description": "MongoDB ObjectId of the parent post" },
+          "creator": { "type": "string", "example": "janedoe", "description": "Username of the commenter" },
+          "content": { "type": "string", "example": "Great post!" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string" }
+        }
+      }
+    }
+  },
   "paths": {
     "/api/posts": {
       "get": {
-        "summary": "Get all posts",
+        "summary": "Get all posts (paginated)",
+        "description": "Returns posts sorted by newest first. Each post includes a commentCount field.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1, "example": 1 },
+            "description": "Page number"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 20, "maximum": 100, "example": 20 },
+            "description": "Posts per page (max 100)"
+          }
+        ],
         "responses": {
-          "200": { "description": "Array of posts" }
+          "200": {
+            "description": "Paginated list of posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "posts": { "type": "array", "items": { "$ref": "#/components/schemas/Post" } },
+                    "total": { "type": "integer", "example": 1 },
+                    "page": { "type": "integer", "example": 1 },
+                    "limit": { "type": "integer", "example": 20 }
+                  }
+                }
+              }
+            }
+          }
         }
       },
       "post": {
         "summary": "Create a post",
+        "description": "Creates a new blog post. Tags are auto-generated from the title and content (top 5 keywords).",
         "requestBody": {
           "required": true,
           "content": {
@@ -26,9 +91,9 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "title": { "type": "string" },
-                  "content": { "type": "string" },
-                  "creator": { "type": "string" }
+                  "title": { "type": "string", "example": "My First Blog Post" },
+                  "content": { "type": "string", "example": "This is the body of the blog post about web development." },
+                  "creator": { "type": "string", "example": "johndoe", "description": "Username of the author" }
                 },
                 "required": ["title", "content", "creator"]
               }
@@ -36,40 +101,115 @@
           }
         },
         "responses": {
-          "201": { "description": "Post created" },
-          "500": { "description": "Server error" }
+          "201": {
+            "description": "Post created successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Post" }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required fields (title, content, or creator)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "title, content, and creator are required" }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
         }
       }
     },
     "/api/posts/search": {
       "get": {
         "summary": "Search posts",
+        "description": "Searches posts by title, content, and tags. Case-insensitive.",
         "parameters": [
           {
             "name": "q",
             "in": "query",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string", "example": "javascript" },
+            "description": "Search term"
           }
         ],
         "responses": {
-          "200": { "description": "Matching posts" }
+          "200": {
+            "description": "Array of matching posts",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Post" } }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing search query",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "missing search query" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/tag/{tag}": {
+      "get": {
+        "summary": "Get posts by tag",
+        "description": "Returns all posts that have the specified tag.",
+        "parameters": [
+          {
+            "name": "tag",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "example": "javascript" },
+            "description": "Tag to filter by"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of posts with that tag",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Post" } }
+              }
+            }
+          }
         }
       }
     },
     "/api/posts/user/{username}": {
       "get": {
         "summary": "Get posts by user",
+        "description": "Returns all posts created by the specified username.",
         "parameters": [
           {
             "name": "username",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string", "example": "johndoe" },
+            "description": "Username of the post creator"
           }
         ],
         "responses": {
-          "200": { "description": "Posts by user" }
+          "200": {
+            "description": "Array of posts by that user",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Post" } }
+              }
+            }
+          }
         }
       }
     },
@@ -81,22 +221,49 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string", "example": "663f1a2b4e12a84f5c9d0e7a" },
+            "description": "MongoDB ObjectId of the post (24-character hex string)"
           }
         ],
         "responses": {
-          "200": { "description": "Post object" },
-          "404": { "description": "Not found" }
+          "200": {
+            "description": "Post object",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Post" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ObjectId format",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "invalid id" }
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "post not found" }
+              }
+            }
+          }
         }
       },
       "put": {
         "summary": "Edit a post",
+        "description": "Updates a post. The creator field must match the original post creator or you get a 403. Tags are regenerated on edit.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string", "example": "663f1a2b4e12a84f5c9d0e7a" },
+            "description": "MongoDB ObjectId of the post (24-character hex string)"
           }
         ],
         "requestBody": {
@@ -106,9 +273,9 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "title": { "type": "string" },
-                  "content": { "type": "string" },
-                  "creator": { "type": "string" }
+                  "title": { "type": "string", "example": "Updated Blog Post Title" },
+                  "content": { "type": "string", "example": "This is the updated body of the blog post." },
+                  "creator": { "type": "string", "example": "johndoe", "description": "Must match the original post creator" }
                 },
                 "required": ["title", "content", "creator"]
               }
@@ -116,30 +283,89 @@
           }
         },
         "responses": {
-          "200": { "description": "Updated post" },
-          "403": { "description": "Not authorized" },
-          "404": { "description": "Not found" }
+          "200": {
+            "description": "Updated post",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Post" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id or missing required fields",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Creator does not match original post author",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "not authorized" }
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "post not found" }
+              }
+            }
+          }
         }
       },
       "delete": {
         "summary": "Delete a post",
+        "description": "Deletes a post and all of its comments.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string", "example": "663f1a2b4e12a84f5c9d0e7a" },
+            "description": "MongoDB ObjectId of the post (24-character hex string)"
           }
         ],
         "responses": {
-          "200": { "description": "Deleted" },
-          "404": { "description": "Not found" }
+          "200": {
+            "description": "Post deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ObjectId format",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "invalid id" }
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "post not found" }
+              }
+            }
+          }
         }
       }
     },
     "/api/comments": {
       "post": {
-        "summary": "Add a comment",
+        "summary": "Add a comment to a post",
+        "description": "Creates a comment on an existing post. Returns 404 if the post does not exist.",
         "requestBody": {
           "required": true,
           "content": {
@@ -147,9 +373,9 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "postId": { "type": "string" },
-                  "creator": { "type": "string" },
-                  "content": { "type": "string" }
+                  "postId": { "type": "string", "example": "663f1a2b4e12a84f5c9d0e7a", "description": "MongoDB ObjectId of the post to comment on" },
+                  "creator": { "type": "string", "example": "janedoe", "description": "Username of the commenter" },
+                  "content": { "type": "string", "example": "Great post, very helpful!" }
                 },
                 "required": ["postId", "creator", "content"]
               }
@@ -157,23 +383,65 @@
           }
         },
         "responses": {
-          "201": { "description": "Comment created" }
+          "201": {
+            "description": "Comment created successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Comment" }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required fields or invalid postId format",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "post not found" }
+              }
+            }
+          }
         }
       }
     },
     "/api/comments/{postId}": {
       "get": {
         "summary": "Get comments for a post",
+        "description": "Returns all comments for a post, sorted oldest first.",
         "parameters": [
           {
             "name": "postId",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string", "example": "663f1a2b4e12a84f5c9d0e7a" },
+            "description": "MongoDB ObjectId of the post (24-character hex string)"
           }
         ],
         "responses": {
-          "200": { "description": "Array of comments" }
+          "200": {
+            "description": "Array of comments",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Comment" } }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ObjectId format",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "invalid postId" }
+              }
+            }
+          }
         }
       }
     },
@@ -185,12 +453,38 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string", "example": "663f1b3c5f23b95g6d0e1f8b" },
+            "description": "MongoDB ObjectId of the comment (24-character hex string)"
           }
         ],
         "responses": {
-          "200": { "description": "Deleted" },
-          "404": { "description": "Not found" }
+          "200": {
+            "description": "Comment deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ObjectId format",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "invalid id" }
+              }
+            }
+          },
+          "404": {
+            "description": "Comment not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "comment not found" }
+              }
+            }
+          }
         }
       }
     }
