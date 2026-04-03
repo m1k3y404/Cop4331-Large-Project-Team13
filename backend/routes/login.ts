@@ -6,14 +6,20 @@ import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/mailer.j
 
 const router = express.Router();
 
-// REGISTER
+// register
 router.post('/register', async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
 
-    const existing = await User.findOne({ email });
-    if (existing) {
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
       res.status(400).json({ error: 'Email already in use' });
+      return;
+    }
+
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      res.status(400).json({ error: 'Username already in use' });
       return;
     }
 
@@ -30,15 +36,19 @@ router.post('/register', async (req: Request, res: Response) => {
     await sendVerificationEmail(email, verificationToken);
 
     res.status(201).json({ error: '', message: 'Account created! Please check your email to verify.' });
-  } catch (err) {
+  } catch (err: any) {
+    if (err.code === 11000) {
+      res.status(400).json({ error: 'Username or email already in use' });
+      return;
+    }
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// VERIFY EMAIL
+// verify email 
 router.get('/verify-email', async (req: Request, res: Response) => {
   try {
-    const { token } = req.query;
+    const token = req.query.token as string;
     const user = await User.findOne({ verificationToken: token });
 
     if (!user) {
@@ -56,7 +66,7 @@ router.get('/verify-email', async (req: Request, res: Response) => {
   }
 });
 
-// LOGIN - blocks unverified users
+// login - blocks unverified users
 router.post('/login', async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
@@ -78,7 +88,7 @@ router.post('/login', async (req: Request, res: Response) => {
   }
 });
 
-// FORGOT PASSWORD
+// forgot password
 router.post('/forgot-password', async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
@@ -101,7 +111,7 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
   }
 });
 
-// RESET PASSWORD
+// reset password 
 router.post('/reset-password', async (req: Request, res: Response) => {
   try {
     const { token, newPassword } = req.body;

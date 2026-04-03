@@ -1,5 +1,6 @@
-import { Schema, model, connect } from 'mongoose';
-interface IUser {
+import { Schema, model, connect, Document } from 'mongoose';
+
+interface IUser extends Document {
   username: string;
   email: string;
   password: string;
@@ -10,7 +11,7 @@ interface IUser {
 }
 
 const userSchema = new Schema<IUser>({
-  username: { type: String, required: true },
+  username: { type: String, required: true, unique: true},
   email: { type: String, required: true, unique: true },
   password: {type: String, required: true},
   isVerified: { type: Boolean, default: false },
