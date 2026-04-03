@@ -1,7 +1,7 @@
 import { Button, Form, Input, Layout, message, Typography } from "antd";
 import { Content } from "antd/es/layout/layout";
 import { useCallback } from "react";
-import { redirect } from "react-router";
+import { redirect, useNavigate } from "react-router";
 
 export function Login() {
     return (
@@ -20,6 +20,7 @@ type AuthBody = {username: string, password: string}
 
 export function LoginForm() {
     const [messageApi, contextHolder] = message.useMessage();
+    const navigate = useNavigate()
 
     const submit = useCallback(async (body: AuthBody) => {
         const response = await fetch("/api/users/login", {
@@ -32,12 +33,12 @@ export function LoginForm() {
 
         if(response.status == 200) {
             localStorage.setItem("token", "success");
-            redirect("/feed")
+            navigate("/feed")
         } else {
             localStorage.removeItem("token");
-            message.error("Authentication Failed")
+            messageApi.error("Authentication Failed")
         }
-    }, [messageApi]);
+    }, [messageApi, navigate]);
     return (
     <Form onFinish={submit}>
         {contextHolder}
