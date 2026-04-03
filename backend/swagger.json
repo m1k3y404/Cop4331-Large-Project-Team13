@@ -6,6 +6,9 @@
     "description": "COP4331 Large Project - Spring 2026. All IDs are MongoDB ObjectIds (24-character hex strings). The 'creator' field is the username of the user making the request."
   },
   "servers": [
+    { "url": "http://13.projectucf.software:3000" },
+    { "url": "http://13.projectucf.software:5000" },
+    { "url": "http://159.223.183.35:3000" },
     { "url": "http://159.223.183.35:5000" },
     { "url": "http://localhost:5000" }
   ],
@@ -42,6 +45,216 @@
     }
   },
   "paths": {
+    "/api/users/register": {
+      "post": {
+        "summary": "Register a new user",
+        "description": "Creates a new account and sends a verification email. User must verify email before logging in.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string", "example": "johndoe" },
+                  "email": { "type": "string", "example": "johndoe@example.com" },
+                  "password": { "type": "string", "example": "mypassword123" }
+                },
+                "required": ["username", "email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created, verification email sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "" },
+                    "message": { "type": "string", "example": "Account created! Please check your email to verify." }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Username or email already in use",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "Email already in use" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "summary": "Log in",
+        "description": "Authenticates a user. Returns error if credentials are wrong or email is not verified.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string", "example": "johndoe" },
+                  "password": { "type": "string", "example": "mypassword123" }
+                },
+                "required": ["username", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful (empty error string means success)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "" }
+              }
+            }
+          },
+          "403": {
+            "description": "Email not verified",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "Please verify your email before logging in" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/verify-email": {
+      "get": {
+        "summary": "Verify email address",
+        "description": "Verifies a user's email using the token sent to their inbox.",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string", "example": "abc123def456" },
+            "description": "Verification token from the email link"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Email verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "" },
+                    "message": { "type": "string", "example": "Email verified! You can now log in." }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "Invalid or expired token" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/forgot-password": {
+      "post": {
+        "summary": "Request password reset",
+        "description": "Sends a password reset email if the email exists. Always returns success to prevent email enumeration.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "johndoe@example.com" }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset email sent (if account exists)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "" },
+                    "message": { "type": "string", "example": "If that email exists, a reset link has been sent." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/reset-password": {
+      "post": {
+        "summary": "Reset password",
+        "description": "Resets the user's password using a valid reset token from the email.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": { "type": "string", "example": "abc123def456", "description": "Reset token from the email link" },
+                  "newPassword": { "type": "string", "example": "mynewpassword123" }
+                },
+                "required": ["token", "newPassword"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "" },
+                    "message": { "type": "string", "example": "Password reset successful! You can now log in." }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired reset token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "Invalid or expired reset token" }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/posts": {
       "get": {
         "summary": "Get all posts (paginated)",

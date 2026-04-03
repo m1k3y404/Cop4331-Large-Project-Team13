@@ -23,7 +23,7 @@ export function RegisterForm() {
     const navigate = useNavigate()
 
     const submit = useCallback(async (body: RegisterBody) => {
-        const response = await fetch("/api/users/register", {
+        const response = await fetch("http://13.projectucf.software:3000/api/users/register", {
             method: "POST",
             body: JSON.stringify(body),
             headers: {
@@ -31,7 +31,7 @@ export function RegisterForm() {
             }
         });
 
-        if(response.status == 200) {
+        if(response.status == 201) {
             navigate("/verify-email")
         } else {
             messageApi.error("Registration Failed")

@@ -1,17 +1,11 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendVerificationEmail = async (to: string, token: string) => {
   const url = `${process.env.BASE_URL}/api/users/verify-email?token=${token}`;
-  await transporter.sendMail({
-    from: `"MyApp" <${process.env.GMAIL_USER}>`,
+  await resend.emails.send({
+    from: 'Blog App <onboarding@resend.dev>',
     to,
     subject: 'Verify your email',
     html: `<p>Click the link below to verify your email:</p>
@@ -22,8 +16,8 @@ export const sendVerificationEmail = async (to: string, token: string) => {
 
 export const sendPasswordResetEmail = async (to: string, token: string) => {
   const url = `${process.env.BASE_URL}/api/users/reset-password?token=${token}`;
-  await transporter.sendMail({
-    from: `"MyApp" <${process.env.GMAIL_USER}>`,
+  await resend.emails.send({
+    from: 'Blog App <onboarding@resend.dev>',
     to,
     subject: 'Reset your password',
     html: `<p>Click the link below to reset your password:</p>

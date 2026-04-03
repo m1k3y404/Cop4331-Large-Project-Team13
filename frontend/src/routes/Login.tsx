@@ -1,5 +1,7 @@
-import { Button, Form, Input, Layout, Typography } from "antd";
+import { Button, Form, Input, Layout, message, Typography } from "antd";
 import { Content } from "antd/es/layout/layout";
+import { useCallback } from "react";
+import { useNavigate } from "react-router";
 
 export function Login() {
     return (
@@ -14,13 +16,36 @@ export function Login() {
     )
 }
 
+type AuthBody = {username: string, password: string}
+
 export function LoginForm() {
+    const [messageApi, contextHolder] = message.useMessage();
+    const navigate = useNavigate()
+
+    const submit = useCallback(async (body: AuthBody) => {
+        const response = await fetch("http://13.projectucf.software:3000/api/users/login", {
+            method: "POST",
+            body: JSON.stringify(body),
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+
+        if(response.status == 200) {
+            localStorage.setItem("token", "success");
+            navigate("/feed")
+        } else {
+            localStorage.removeItem("token");
+            messageApi.error("Authentication Failed")
+        }
+    }, [messageApi, navigate]);
     return (
-    <Form>
-        <Form.Item label="Username">
+    <Form onFinish={submit}>
+        {contextHolder}
+        <Form.Item label="Username" name="username">
             <Input type="text"></Input>
         </Form.Item>
-        <Form.Item label="Password">
+        <Form.Item label="Password" name="password">
             <Input type="password"></Input>
         </Form.Item>
         <Form.Item>
