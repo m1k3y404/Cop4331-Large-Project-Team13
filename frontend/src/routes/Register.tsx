@@ -1,7 +1,7 @@
 import { Button, Form, Input, Layout, message, Typography } from "antd";
 import { Content } from "antd/es/layout/layout";
 import { useCallback } from "react";
-import { redirect } from "react-router";
+import { redirect, useNavigate } from "react-router";
 
 export function Register() {
     return (
@@ -20,6 +20,7 @@ type RegisterBody = {username: string, email: string, password: string}
 
 export function RegisterForm() {
     const [messageApi, contextHolder] = message.useMessage();
+    const navigate = useNavigate()
 
     const submit = useCallback(async (body: RegisterBody) => {
         const response = await fetch("/api/users/register", {
@@ -31,12 +32,12 @@ export function RegisterForm() {
         });
 
         if(response.status == 200) {
-            redirect("/verify-email")
+            navigate("/verify-email")
         } else {
-            message.error("Registration Failed")
+            messageApi.error("Registration Failed")
         }
-    }, [messageApi]);
-    
+    }, [messageApi, navigate]);
+
     return (
     <Form onFinish={submit}>
         {contextHolder}
