@@ -6,6 +6,7 @@
     "description": "COP4331 Large Project - Spring 2026. All IDs are MongoDB ObjectIds (24-character hex strings). The 'creator' field is the username of the user making the request."
   },
   "servers": [
+    { "url": "http://13.projectucf.software:5000" },
     { "url": "http://159.223.183.35:5000" },
     { "url": "http://localhost:5000" }
   ],
