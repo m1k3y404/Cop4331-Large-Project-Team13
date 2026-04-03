@@ -23,7 +23,7 @@ export function LoginForm() {
     const navigate = useNavigate()
 
     const submit = useCallback(async (body: AuthBody) => {
-        const response = await fetch("/api/users/login", {
+        const response = await fetch("http://13.projectucf.software:3000/api/users/login", {
             method: "POST",
             body: JSON.stringify(body),
             headers: {
