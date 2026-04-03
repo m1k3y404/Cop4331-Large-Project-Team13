@@ -40,5 +40,5 @@ app.use('/api/posts', postsRoute);
 app.use('/api/comments', commentsRoute);
 
 connectDB().then(() => {
-  app.listen(5000);
+  app.listen(3000);
 });

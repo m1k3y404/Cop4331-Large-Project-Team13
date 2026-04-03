@@ -12,17 +12,21 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "mongodb": "^7.1.1",
     "mongoose": "^9.3.3",
+    "nodemailer": "^8.0.4",
     "swagger-ui-dist": "^5.32.1",
     "vitest": "^3.2.4"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
+    "@types/nodemailer": "^7.0.11",
     "typescript": "^6.0.2"
   }
 }

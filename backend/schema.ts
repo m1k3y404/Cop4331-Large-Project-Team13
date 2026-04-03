@@ -1,12 +1,22 @@
 import { Schema, model, connect } from 'mongoose';
 interface IUser {
   username: string;
+  email: string;
   password: string;
+  isVerified: boolean;
+  verificationToken: string | null;
+  resetPasswordToken: string | null;
+  resetPasswordExpires: Date | null;
 }
 
 const userSchema = new Schema<IUser>({
   username: { type: String, required: true },
-  password: {type: String, required: true}
+  email: { type: String, required: true, unique: true },
+  password: {type: String, required: true},
+  isVerified: { type: Boolean, default: false },
+  verificationToken: { type: String, default: null },
+  resetPasswordToken: { type: String, default: null },
+  resetPasswordExpires: { type: Date, default: null },
 });
 
 const User = model<IUser>('User',userSchema);
