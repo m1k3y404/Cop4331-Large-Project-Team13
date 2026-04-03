@@ -3,27 +3,27 @@ import { Content } from "antd/es/layout/layout";
 import { useCallback } from "react";
 import { useNavigate } from "react-router";
 
-export function Login() {
+export function Register() {
     return (
         <Layout>
             <Content style={{padding: '48px'}}>
                 <Typography.Title level={2}>
-                    Log In
+                    Register
                 </Typography.Title>
-                <LoginForm />
+                <RegisterForm />
             </Content>
         </Layout>
     )
 }
 
-type AuthBody = {username: string, password: string}
+type RegisterBody = {username: string, email: string, password: string}
 
-export function LoginForm() {
+export function RegisterForm() {
     const [messageApi, contextHolder] = message.useMessage();
     const navigate = useNavigate()
 
-    const submit = useCallback(async (body: AuthBody) => {
-        const response = await fetch("/api/users/login", {
+    const submit = useCallback(async (body: RegisterBody) => {
+        const response = await fetch("/api/users/register", {
             method: "POST",
             body: JSON.stringify(body),
             headers: {
@@ -31,19 +31,21 @@ export function LoginForm() {
             }
         });
 
-        if(response.status == 200) {
-            localStorage.setItem("token", "success");
-            navigate("/feed")
+        if(response.status == 201) {
+            navigate("/verify-email")
         } else {
-            localStorage.removeItem("token");
-            messageApi.error("Authentication Failed")
+            messageApi.error("Registration Failed")
         }
     }, [messageApi, navigate]);
+
     return (
     <Form onFinish={submit}>
         {contextHolder}
         <Form.Item label="Username" name="username">
             <Input type="text"></Input>
+        </Form.Item>
+        <Form.Item label="Email" name="email">
+            <Input type="email"></Input>
         </Form.Item>
         <Form.Item label="Password" name="password">
             <Input type="password"></Input>
