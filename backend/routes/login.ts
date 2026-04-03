@@ -24,17 +24,14 @@ router.post('/register', async (req: Request, res: Response) => {
       return;
     }
 
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-
     const user = new User({
       username,
       email,
       password,
-      verificationToken,
+      isVerified: true,
     });
 
     await user.save();
-    await sendVerificationEmail(email, verificationToken);
 
     res.status(201).json({ error: '', message: 'Account created! Please check your email to verify.' });
   } catch (err: any) {
