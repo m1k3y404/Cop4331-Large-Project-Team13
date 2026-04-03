@@ -18,7 +18,6 @@
     "mongodb": "^7.1.1",
     "mongoose": "^9.3.3",
     "nodemailer": "^8.0.4",
-    "swagger-ui-dist": "^5.32.1",
     "vitest": "^3.2.4"
   },
   "devDependencies": {
