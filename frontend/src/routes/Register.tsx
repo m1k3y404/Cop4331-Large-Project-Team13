@@ -31,7 +31,7 @@ export function RegisterForm() {
             }
         });
 
-        if(response.status == 200) {
+        if(response.status == 201) {
             navigate("/verify-email")
         } else {
             messageApi.error("Registration Failed")
