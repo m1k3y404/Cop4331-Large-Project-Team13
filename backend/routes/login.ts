@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { User } from '../schema.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/mailer.js';
 
+
 const router = express.Router();
 
 // register
