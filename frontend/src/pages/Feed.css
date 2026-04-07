@@ -1,0 +1,10 @@
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.feed-header h1 {
+  margin: 0;
+}
