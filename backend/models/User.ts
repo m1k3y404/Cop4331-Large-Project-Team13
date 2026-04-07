@@ -22,16 +22,5 @@ const userSchema = new Schema<IUser>({
 
 const User = model<IUser>('User',userSchema);
 
-
-const connectDB = async () => {
-  try {
-    await connect(process.env.MONGO_URI as string);
-    console.log('MongoDB Connected');
-  } catch (err) {
-    console.error(err);
-    process.exit(1);
-  }
-};
-
-
-export {User, connectDB};
+export { User };
+export type { IUser };

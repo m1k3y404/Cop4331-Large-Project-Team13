@@ -1,7 +1,7 @@
 import express from 'express';
 import type { Request, Response } from 'express';
 import crypto from 'crypto';
-import { User } from '../schema.js';
+import { User } from '../models/User.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/mailer.js';
 
 
