@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import { Types, isValidObjectId } from 'mongoose';
 import { Post } from '../models/Post.js';
 import { Comment } from '../models/Comment.js';
+import { analyzePostInBackground } from '../utils/tagger.js';
 
 const router = express.Router();
 
@@ -34,6 +35,7 @@ router.post('/', async (req: Request, res: Response) => {
     }
     const tags = extractTags(title, content);
     const newPost = await Post.create({ title, content, creator, tags });
+    analyzePostInBackground(newPost._id.toString(), content);
     res.status(201).json(newPost);
   } catch (err) {
     res.status(500).json({ error: 'something went wrong' });
