@@ -22,8 +22,9 @@ void main() {
     await tester.tap(find.text('Login'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Login'), findsNothing);
-    expect(find.text('Welcome user'), findsOneWidget);
+    expect(find.text('Create your Tilt account'), findsNothing);
+    expect(find.text('Welcome back'), findsOneWidget);
+    expect(find.text('Username'), findsOneWidget);
   });
 
   testWidgets('start writing logs in and opens the writing page', (
@@ -35,6 +36,7 @@ void main() {
     expect(find.text('Login'), findsOneWidget);
     expect(find.text('Start writing'), findsOneWidget);
 
+    await tester.ensureVisible(find.text('Start writing'));
     await tester.tap(find.text('Start writing'));
     await tester.pumpAndSettle();
 
