@@ -20,7 +20,7 @@ export const PostCard: React.FC<PostCardProps> = ({
   creator,
   createdAt,
   tags = [],
-  sentiment,
+  //sentiment,
 }) => {
   const handleDelete = async () => {
     try {
