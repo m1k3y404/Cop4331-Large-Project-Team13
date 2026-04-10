@@ -21,8 +21,7 @@ router.post('/', async (req: Request, res: Response) => {
       res.status(400).json({ error: 'title, content, and creator are required' });
       return;
     }
-    const tags = extractTags(title, content);
-    const newPost = await Post.create({ title, content, creator, tags });
+    const newPost = await Post.create({ title, content, creator, sentimentScores: [] });
     analyzePostInBackground(newPost._id.toString(), content);
     res.status(201).json(newPost);
   } catch (err) {
