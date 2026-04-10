@@ -6,7 +6,7 @@ import {Post} from '../models/Post.js';
 export const analyzePostInBackground = async (postId: string, content: string) => {
   try {
     const { output } = await generateText({
-      model: google('gemini-2.0-flash-exp'),
+      model: google('gemini-2.5-flash'),
       output: Output.object({
         schema: z.object({
             optimism: z.number().min(0).max(1),

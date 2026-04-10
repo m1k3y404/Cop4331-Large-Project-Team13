@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import { Types, isValidObjectId } from 'mongoose';
 import { Post } from '../models/Post.js';
 import { Comment } from '../models/Comment.js';
-import { analyzePostInBackground } from '../utils/tagger.js';
+import { analyzePostInBackground } from '../utils/sentiment_analizer.js';
 
 const router = express.Router();
 
@@ -140,21 +140,11 @@ router.delete('/:id', async (req: Request, res: Response) => {
       res.status(400).json({ error: 'invalid id' });
       return;
     }
-    const { creator } = req.body as { creator: string };
-    if (!creator) {
-      res.status(400).json({ error: 'creator is required' });
-      return;
-    }
-    const post = await Post.findById(id);
+    const post = await Post.findByIdAndDelete(id);
     if (!post) {
       res.status(404).json({ error: 'post not found' });
       return;
     }
-    if (post.creator !== creator) {
-      res.status(403).json({ error: 'not authorized' });
-      return;
-    }
-    await post.deleteOne();
     await Comment.deleteMany({ postId: new Types.ObjectId(id) });
     res.status(200).json({ error: '' });
   } catch (err) {
