@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/app/blog_app.dart';
+import 'package:mobile/features/writing/presentation/writing_screen.dart';
 
 void main() {
   testWidgets('login button switches to welcome message', (
@@ -43,5 +45,16 @@ void main() {
     expect(find.text('Welcome back'), findsOneWidget);
     expect(find.text('Username'), findsOneWidget);
     expect(find.text('Password'), findsOneWidget);
+  });
+
+  testWidgets('writing screen shows a visible submit action', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: WritingScreen()));
+    await tester.pumpAndSettle();
+
+    expect(find.text('New blog post'), findsOneWidget);
+    expect(find.text('Submit Post'), findsOneWidget);
+    expect(find.text('Clear'), findsOneWidget);
   });
 }

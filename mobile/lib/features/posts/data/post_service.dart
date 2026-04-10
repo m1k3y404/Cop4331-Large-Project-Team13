@@ -27,6 +27,19 @@ class PostService {
         .toList(growable: false);
   }
 
+  Future<Post> createPost({
+    required String title,
+    required String content,
+    required String creator,
+  }) async {
+    final response = await _apiClient.post(
+      '/posts',
+      body: {'title': title, 'content': content, 'creator': creator},
+    );
+
+    return Post.fromJson(response);
+  }
+
   void close() {
     if (_ownsApiClient) {
       _apiClient.close();

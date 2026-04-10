@@ -56,7 +56,7 @@ class _LandingScreenState extends State<LandingScreen> {
       }
     }
 
-    Navigator.of(context).pushNamed(AppRouter.writingRoute);
+    Navigator.of(context).pushNamed(AppRouter.writingRoute, arguments: _username);
   }
 
   Future<void> _loadPosts() async {

@@ -22,8 +22,11 @@ class AppRouter {
           settings: settings,
         );
       case writingRoute:
+        final username = settings.arguments is String
+            ? settings.arguments as String
+            : null;
         return MaterialPageRoute<void>(
-          builder: (_) => const WritingScreen(),
+          builder: (_) => WritingScreen(username: username),
           settings: settings,
         );
       default:
