@@ -4,7 +4,7 @@ interface IPost {
   title: string;
   content: string;
   creator: string;
-  tags: string[];
+  sentimentScores: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -13,7 +13,10 @@ const postSchema = new Schema<IPost>({
   title: { type: String, required: true, trim: true, minlength: 1 },
   content: { type: String, required: true, trim: true, minlength: 1 },
   creator: { type: String, required: true, trim: true, minlength: 1 },
-  tags: { type: [String], default: [] },
+  sentimentScores: { type: [{
+    label: { type: String, required: true },
+    score: { type: Number, required: true }
+  }], default: [] },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
