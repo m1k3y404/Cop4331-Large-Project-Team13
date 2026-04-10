@@ -28,11 +28,6 @@ class TopBar extends StatelessWidget {
                   color: Color(0xFF1F1A17),
                 ),
               ),
-              SizedBox(height: 4),
-              Text(
-                'Shape your feed with smarter tagging',
-                style: TextStyle(fontSize: 14, color: Color(0xFF6B625B)),
-              ),
             ],
           ),
         ),

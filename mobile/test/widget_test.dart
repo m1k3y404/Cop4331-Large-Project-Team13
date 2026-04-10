@@ -13,13 +13,8 @@ void main() {
     expect(find.text('Tilt'), findsOneWidget);
     expect(find.text('Login'), findsOneWidget);
     expect(find.text('Welcome user'), findsNothing);
-    expect(
-      find.text(
-        'Post blogs, auto-tag them with AI, and tune the feed you actually want.',
-      ),
-      findsOneWidget,
-    );
-    expect(find.text('Featured draft'), findsOneWidget);
+    expect(find.text('Start writing'), findsOneWidget);
+    expect(find.text('Latest posts'), findsOneWidget);
 
     await tester.tap(find.text('Login'));
     await tester.pumpAndSettle();
