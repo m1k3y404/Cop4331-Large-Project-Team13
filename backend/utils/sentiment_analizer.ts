@@ -43,7 +43,7 @@ export const analyzePostInBackground = async (postId: string, content: string) =
       isAnalyzed: true 
     });
 
-    console.log(`Successfully scored post: ${postId}`);
+    console.log(`Successfully scored post: ${postId} with scores:`, output);
   } catch (error) {
     console.error(`Background scoring failed for ${postId}:`, error);
   }
