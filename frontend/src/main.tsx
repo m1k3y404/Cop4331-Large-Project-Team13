@@ -9,7 +9,7 @@ import { Index } from './routes/Index.tsx'
 import { VerifyEmail } from './routes/VerifyEmail.tsx'
 import Feed from './pages/Feed.tsx'
 import Editor from './pages/Editor.tsx'
-import { Feed } from './routes/Feed.tsx'
+//import { Feed } from './routes/Feed.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
