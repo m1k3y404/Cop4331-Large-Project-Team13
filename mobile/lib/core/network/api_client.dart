@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
@@ -120,6 +121,7 @@ class ApiClient {
           throw ArgumentError.value(method, 'method', 'Unsupported method');
       }
 
+      _logResponse(method: method, uri: uri, response: response, body: body);
       return _decodeResponse(response);
     } on TimeoutException {
       throw ApiException(message: 'Request timed out. Please try again.');
@@ -165,6 +167,28 @@ class ApiClient {
 
   String _normalizePath(String path) {
     return path.startsWith('/') ? path : '/$path';
+  }
+
+  void _logResponse({
+    required String method,
+    required Uri uri,
+    required http.Response response,
+    Map<String, dynamic>? body,
+  }) {
+    if (!kDebugMode || !_shouldLog(uri)) {
+      return;
+    }
+
+    debugPrint(
+      '[ApiClient] $method $uri '
+      'status=${response.statusCode} '
+      'request=${body == null ? '{}' : jsonEncode(body)} '
+      'response=${response.body}',
+    );
+  }
+
+  bool _shouldLog(Uri uri) {
+    return uri.path.endsWith('/users/login') || uri.path.endsWith('/users/register');
   }
 
   void close() {
