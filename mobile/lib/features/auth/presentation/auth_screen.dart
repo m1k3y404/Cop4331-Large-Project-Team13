@@ -113,7 +113,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         Text(
                           isLogin
                               ? 'Welcome back'
-                              : 'Create your Inkly account',
+                              : 'Create your Tilt account',
                           style: theme.textTheme.headlineMedium,
                         ),
                         const SizedBox(height: 12),

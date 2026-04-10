@@ -9,7 +9,7 @@ class BlogApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Inkly',
+      title: 'Tilt',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       initialRoute: AppRouter.landingRoute,

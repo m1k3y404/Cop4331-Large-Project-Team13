@@ -198,7 +198,7 @@ class _HeroSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(999),
           ),
           child: const Text(
-            'Simple blogging, one post at a time',
+            'Blogging with a more controllable algorithm',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -208,12 +208,12 @@ class _HeroSection extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Text(
-          'Write clearly. Share quickly. Keep your stories in one calm place.',
+          'Post blogs, auto-tag them with AI, and tune the feed you actually want.',
           style: theme.textTheme.displayLarge,
         ),
         const SizedBox(height: 20),
         Text(
-          'This first mobile experience now pulls in live posts from your backend so the landing screen can double as a quick API connection check.',
+          'Tilt is a blogging app where users control their algorithm better. An LLM auto-tags posts so users can shape what kinds of posts show up alongside core features like publishing, comments, and a feed.',
           style: theme.textTheme.bodyLarge,
         ),
         const SizedBox(height: 28),
@@ -267,13 +267,13 @@ class _PreviewCard extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               featuredPost?.title ??
-                  'Building a quieter reading experience for everyday blogging.',
+                  'Designing a feed that listens to readers, not just engagement.',
               style: theme.textTheme.headlineMedium,
             ),
             const SizedBox(height: 16),
             Text(
               featuredPost?.preview ??
-                  'A lightweight landing page is in place now so the mobile app has a clear starting point while login, publishing, and personalized feeds are built incrementally.',
+                  'Tilt pairs normal blogging features with LLM-generated tags so readers can guide the recommendation mix around the topics they care about most.',
               style: theme.textTheme.bodyLarge,
             ),
             const SizedBox(height: 24),

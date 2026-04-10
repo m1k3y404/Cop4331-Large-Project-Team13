@@ -8,12 +8,12 @@ void main() {
     await tester.pumpWidget(const BlogApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('Inkly'), findsOneWidget);
+    expect(find.text('Tilt'), findsOneWidget);
     expect(find.text('Login'), findsOneWidget);
     expect(find.text('Welcome user'), findsNothing);
     expect(
       find.text(
-        'Write clearly. Share quickly. Keep your stories in one calm place.',
+        'Post blogs, auto-tag them with AI, and tune the feed you actually want.',
       ),
       findsOneWidget,
     );

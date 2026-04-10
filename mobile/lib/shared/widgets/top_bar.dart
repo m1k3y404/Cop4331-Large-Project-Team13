@@ -21,7 +21,7 @@ class TopBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Inkly',
+                'Tilt',
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w700,
@@ -30,7 +30,7 @@ class TopBar extends StatelessWidget {
               ),
               SizedBox(height: 4),
               Text(
-                'A simple space for stories',
+                'Shape your feed with smarter tagging',
                 style: TextStyle(fontSize: 14, color: Color(0xFF6B625B)),
               ),
             ],

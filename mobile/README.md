@@ -1,6 +1,6 @@
-# mobile
+# Tilt
 
-A new Flutter project.
+Tilt is a blogging app where users control their algorithm better. An LLM auto-tags posts so users can shape what kinds of content show up in their feed, alongside core features like post creation, comments, and discovery.
 
 ## Getting Started
 
