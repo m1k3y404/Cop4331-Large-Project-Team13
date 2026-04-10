@@ -27,7 +27,7 @@ void main() {
     expect(find.text('Username'), findsOneWidget);
   });
 
-  testWidgets('start writing logs in and opens the writing page', (
+  testWidgets('start writing sends logged-out users to auth first', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const BlogApp());
@@ -40,8 +40,8 @@ void main() {
     await tester.tap(find.text('Start writing'));
     await tester.pumpAndSettle();
 
-    expect(find.text('New blog post'), findsOneWidget);
-    expect(find.text('Title'), findsOneWidget);
-    expect(find.text('Write your story here...'), findsOneWidget);
+    expect(find.text('Welcome back'), findsOneWidget);
+    expect(find.text('Username'), findsOneWidget);
+    expect(find.text('Password'), findsOneWidget);
   });
 }
