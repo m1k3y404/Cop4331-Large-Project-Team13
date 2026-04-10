@@ -59,10 +59,8 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd /var/big-project-server
-            npm ci --production
-            # Restart PM2
-            pm2 reload express-server --update-env || pm2 start server.js --name "express-server"
+            npm ci
+            pm2 delete express-server || true
+            pm2 start npm --name "express-server" -- start
             pm2 save
-            
-            # Use sudo for Nginx if not root
             sudo nginx -s reload
