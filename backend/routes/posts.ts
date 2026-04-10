@@ -9,18 +9,6 @@ const router = express.Router();
 
 const stopwords = ['the','and','for','that','this','with','from','have','are','was','were','they','you','your','not','but','can','will','just','what','when','been','also','more','into','than','then','some','would','there'];
 
-function extractTags(title: string, content: string) {
-  const text = (title + ' ' + content).toLowerCase();
-  const words = text.split(/\W+/).filter(w => w.length > 3 && !stopwords.includes(w));
-  const freq: Record<string, number> = {};
-  for (const w of words) {
-    freq[w] = (freq[w] ?? 0) + 1;
-  }
-  return Object.entries(freq)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(e => e[0]);
-}
 
 function escapeRegex(str: string) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -87,17 +75,6 @@ router.get('/search', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'something went wrong' });
   }
 });
-
-router.get('/tag/:tag', async (req: Request, res: Response) => {
-  try {
-    const tag = req.params['tag'] as string;
-    const posts = await Post.find({ tags: tag }).sort({ createdAt: -1 });
-    res.status(200).json(posts);
-  } catch (err) {
-    res.status(500).json({ error: 'something went wrong' });
-  }
-});
-
 router.get('/user/:username', async (req: Request, res: Response) => {
   try {
     const username = req.params['username'] as string;
@@ -147,10 +124,8 @@ router.put('/:id', async (req: Request, res: Response) => {
       res.status(403).json({ error: 'not authorized' });
       return;
     }
-    const tags = extractTags(title, content);
     post.title = title;
     post.content = content;
-    post.tags = tags;
     post.updatedAt = new Date();
     await post.save();
     res.status(200).json(post);
