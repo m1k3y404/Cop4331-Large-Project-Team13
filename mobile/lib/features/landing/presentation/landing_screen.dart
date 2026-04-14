@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/app_scope.dart';
 import '../../../app/router/app_router.dart';
-import '../../../core/network/api_exception.dart';
+import '../../../shared/models/post.dart';
+import '../../../shared/models/score_filter.dart';
+import '../../../shared/navigation/route_args.dart';
+import '../../../shared/utils/error_formatting.dart';
+import '../../../shared/widgets/post_card.dart';
 import '../../../shared/widgets/top_bar.dart';
-import '../../posts/data/models/post.dart';
-import '../../posts/data/post_service.dart';
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
@@ -14,66 +17,67 @@ class LandingScreen extends StatefulWidget {
 }
 
 class _LandingScreenState extends State<LandingScreen> {
-  final PostService _postService = PostService();
+  static const int _pageSize = 10;
 
-  bool _isLoggedIn = false;
-  bool _isLoadingPosts = true;
-  String _username = 'user';
-  String? _postsError;
-  List<Post> _posts = const [];
+  final TextEditingController _searchController = TextEditingController();
+
+  List<PostModel> _posts = const [];
+  List<ScoreFilter> _activeFilters = const [];
+  bool _isLoading = true;
+  bool _isLoadingMore = false;
+  String? _error;
+  int _page = 1;
+  int _total = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadPosts();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadPosts(reset: true);
+    });
   }
 
   @override
   void dispose() {
-    _postService.close();
+    _searchController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
-    final username = await Navigator.of(
-      context,
-    ).pushNamed<String?>(AppRouter.authRoute);
-    if (!mounted || username == null || username.isEmpty) {
-      return;
+  bool get _hasMore => _posts.length < _total;
+
+  Future<void> _loadPosts({required bool reset}) async {
+    if (reset) {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+    } else {
+      setState(() {
+        _isLoadingMore = true;
+        _error = null;
+      });
     }
 
-    setState(() {
-      _isLoggedIn = true;
-      _username = username;
-    });
-  }
-
-  Future<void> _handleStartWriting() async {
-    if (!_isLoggedIn) {
-      await _handleLogin();
-      if (!_isLoggedIn || !mounted) {
-        return;
-      }
-    }
-
-    Navigator.of(context).pushNamed(AppRouter.writingRoute, arguments: _username);
-  }
-
-  Future<void> _loadPosts() async {
-    setState(() {
-      _isLoadingPosts = true;
-      _postsError = null;
-    });
+    final repository = AppScope.of(context).postsRepository;
+    final nextPage = reset ? 1 : _page + 1;
 
     try {
-      final posts = await _postService.fetchPosts();
+      final response = _activeFilters.isEmpty
+          ? await repository.fetchLatestPosts(page: nextPage, limit: _pageSize)
+          : await repository.filterPosts(
+              _activeFilters,
+              page: nextPage,
+              limit: _pageSize,
+            );
+
       if (!mounted) {
         return;
       }
 
       setState(() {
-        _posts = posts;
-        _isLoadingPosts = false;
+        _posts = reset ? response.posts : [..._posts, ...response.posts];
+        _page = response.page;
+        _total = response.total;
       });
     } catch (error) {
       if (!mounted) {
@@ -81,246 +85,522 @@ class _LandingScreenState extends State<LandingScreen> {
       }
 
       setState(() {
-        _postsError = _toErrorMessage(error);
-        _isLoadingPosts = false;
+        _error = formatErrorMessage(error);
       });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _isLoadingMore = false;
+        });
+      }
     }
   }
 
-  String _toErrorMessage(Object error) {
-    if (error is ApiException) {
-      return error.message;
+  Future<void> _openWriter() async {
+    final result = await Navigator.of(
+      context,
+    ).pushNamed(AppRouter.writingRoute);
+    if (result == true && mounted) {
+      await _loadPosts(reset: true);
     }
-
-    return 'Something went wrong while loading posts.';
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final horizontalPadding = constraints.maxWidth >= 900 ? 64.0 : 24.0;
-
-            return SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                horizontal: horizontalPadding,
-                vertical: 24,
-              ),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1100),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TopBar(
-                        isLoggedIn: _isLoggedIn,
-                        username: _username,
-                        onLoginPressed: () {
-                          _handleLogin();
-                        },
-                      ),
-                      const SizedBox(height: 32),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: ElevatedButton(
-                          onPressed: _handleStartWriting,
-                          child: const Text('Start writing'),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      _PostsSection(
-                        posts: _posts,
-                        isLoading: _isLoadingPosts,
-                        errorMessage: _postsError,
-                        onRetry: _loadPosts,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
+  Future<void> _openSearch() async {
+    await Navigator.of(context).pushNamed(
+      AppRouter.searchRoute,
+      arguments: SearchScreenArgs(initialQuery: _searchController.text.trim()),
     );
   }
-}
 
-class _PostsSection extends StatelessWidget {
-  const _PostsSection({
-    required this.posts,
-    required this.isLoading,
-    required this.errorMessage,
-    required this.onRetry,
-  });
+  Future<void> _openMyPosts() async {
+    final result = await Navigator.of(
+      context,
+    ).pushNamed(AppRouter.myPostsRoute);
+    if (result == true && mounted) {
+      await _loadPosts(reset: true);
+    }
+  }
 
-  final List<Post> posts;
-  final bool isLoading;
-  final String? errorMessage;
-  final Future<void> Function() onRetry;
+  Future<void> _openLogin() async {
+    final result = await Navigator.of(context).pushNamed(AppRouter.loginRoute);
+    if (result == true && mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _openRegister() async {
+    await Navigator.of(context).pushNamed(AppRouter.registerRoute);
+  }
+
+  Future<void> _openPost(PostModel post) async {
+    final result = await Navigator.of(context).pushNamed(
+      AppRouter.postDetailRoute,
+      arguments: PostDetailArgs(postId: post.id, initialPost: post),
+    );
+    if (result == true && mounted) {
+      await _loadPosts(reset: true);
+    }
+  }
+
+  Future<void> _editPost(PostModel post) async {
+    final result = await Navigator.of(context).pushNamed(
+      AppRouter.editPostRoute,
+      arguments: WritingScreenArgs(initialPost: post),
+    );
+    if (result == true && mounted) {
+      await _loadPosts(reset: true);
+    }
+  }
+
+  Future<void> _deletePost(PostModel post) async {
+    final repository = AppScope.of(context).postsRepository;
+    final confirmed =
+        await showDialog<bool>(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Delete post?'),
+              content: Text(
+                'This will remove "${post.title}" and all of its comments.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('Delete'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await repository.deletePost(post.id);
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Post deleted.')));
+      await _loadPosts(reset: true);
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(formatErrorMessage(error))));
+    }
+  }
+
+  Future<void> _signOut() async {
+    await AppScope.of(context).sessionController.signOut();
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Signed out.')));
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final services = AppScope.of(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Latest posts', style: theme.textTheme.headlineMedium),
-        const SizedBox(height: 20),
-        if (isLoading)
-          const Card(
-            child: Padding(
-              padding: EdgeInsets.all(24),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-          )
-        else if (errorMessage != null)
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return AnimatedBuilder(
+      animation: services.sessionController,
+      builder: (context, _) {
+        final latestSession = services.sessionController.state;
+
+        return Scaffold(
+          body: SafeArea(
+            child: RefreshIndicator(
+              onRefresh: () => _loadPosts(reset: true),
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
                 children: [
-                  Text(
-                    'Could not load posts',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
+                  TopBar(
+                    title: 'Inkly',
+                    subtitle:
+                        'Browse, write, search, and manage every post flow.',
+                    isLoggedIn: latestSession.isSignedIn,
+                    username: latestSession.username,
+                    onCreatePressed: _openWriter,
+                    onMyPostsPressed: _openMyPosts,
+                    onSearchPressed: _openSearch,
+                    onLoginPressed: _openLogin,
+                    onRegisterPressed: _openRegister,
+                    onSignOutPressed: _signOut,
+                  ),
+                  const SizedBox(height: 24),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Latest posts and score queries',
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            latestSession.isSignedIn
+                                ? 'You are signed in as ${latestSession.username}. Create posts, leave comments, and manage your own content from here.'
+                                : 'Sign in when you want to publish or comment. You can still browse the feed and run score-range queries right away.',
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                          const SizedBox(height: 20),
+                          TextField(
+                            controller: _searchController,
+                            textInputAction: TextInputAction.search,
+                            onSubmitted: (_) => _openSearch(),
+                            decoration: InputDecoration(
+                              hintText:
+                                  'Search posts by title, content, or tags',
+                              suffixIcon: IconButton(
+                                onPressed: _openSearch,
+                                icon: const Icon(Icons.search),
+                              ),
+                              border: const OutlineInputBorder(),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(errorMessage!, style: theme.textTheme.bodyMedium),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: () {
-                      onRetry();
+                  const SizedBox(height: 20),
+                  _ScoreFilterPanel(
+                    activeFilters: _activeFilters,
+                    onApply: (filters) {
+                      setState(() {
+                        _activeFilters = filters;
+                      });
+                      _loadPosts(reset: true);
                     },
-                    child: const Text('Try again'),
+                    onClear: () {
+                      setState(() {
+                        _activeFilters = const [];
+                      });
+                      _loadPosts(reset: true);
+                    },
                   ),
+                  const SizedBox(height: 20),
+                  Text(
+                    _activeFilters.isEmpty ? 'Recent posts' : 'Filtered posts',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  if (_isLoading)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 48),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (_error != null)
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Could not load posts',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(_error!),
+                            const SizedBox(height: 12),
+                            ElevatedButton(
+                              onPressed: () => _loadPosts(reset: true),
+                              child: const Text('Try again'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else if (_posts.isEmpty)
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Text(
+                          _activeFilters.isEmpty
+                              ? 'No posts are available yet.'
+                              : 'No posts match the selected score ranges.',
+                        ),
+                      ),
+                    )
+                  else
+                    ..._posts.map(
+                      (post) => Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: PostCard(
+                          post: post,
+                          onTap: () => _openPost(post),
+                          onEdit: post.isOwnedBy(latestSession.username)
+                              ? () => _editPost(post)
+                              : null,
+                          onDelete: post.isOwnedBy(latestSession.username)
+                              ? () => _deletePost(post)
+                              : null,
+                        ),
+                      ),
+                    ),
+                  if (_hasMore)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Center(
+                        child: ElevatedButton(
+                          onPressed: _isLoadingMore
+                              ? null
+                              : () => _loadPosts(reset: false),
+                          child: Text(
+                            _isLoadingMore ? 'Loading...' : 'Load more',
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
-          )
-        else if (posts.isEmpty)
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(
-                'The API request succeeded, but there are no posts yet.',
-                style: theme.textTheme.bodyLarge,
-              ),
-            ),
-          )
-        else
-          Column(
-            children: posts
-                .map(
-                  (post) => Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: _PostCard(post: post),
-                  ),
-                )
-                .toList(growable: false),
           ),
-      ],
+        );
+      },
     );
   }
 }
 
-class _PostCard extends StatelessWidget {
-  const _PostCard({required this.post});
+class _ScoreFilterPanel extends StatefulWidget {
+  const _ScoreFilterPanel({
+    required this.activeFilters,
+    required this.onApply,
+    required this.onClear,
+  });
 
-  final Post post;
+  final List<ScoreFilter> activeFilters;
+  final ValueChanged<List<ScoreFilter>> onApply;
+  final VoidCallback onClear;
+
+  @override
+  State<_ScoreFilterPanel> createState() => _ScoreFilterPanelState();
+}
+
+class _ScoreFilterPanelState extends State<_ScoreFilterPanel> {
+  late final List<_FilterControllers> _rows;
+
+  @override
+  void initState() {
+    super.initState();
+    _rows = widget.activeFilters.isEmpty
+        ? [_FilterControllers()]
+        : widget.activeFilters.map(_FilterControllers.fromFilter).toList();
+  }
+
+  @override
+  void dispose() {
+    for (final row in _rows) {
+      row.dispose();
+    }
+    super.dispose();
+  }
+
+  void _addRow() {
+    setState(() {
+      _rows.add(_FilterControllers());
+    });
+  }
+
+  void _removeRow(int index) {
+    if (_rows.length == 1) {
+      _rows[index].clear();
+      setState(() {});
+      return;
+    }
+
+    final row = _rows.removeAt(index);
+    row.dispose();
+    setState(() {});
+  }
+
+  void _clearAll() {
+    for (final row in _rows) {
+      row.dispose();
+    }
+    setState(() {
+      _rows
+        ..clear()
+        ..add(_FilterControllers());
+    });
+    widget.onClear();
+  }
+
+  void _applyFilters() {
+    final filters = <ScoreFilter>[];
+
+    for (final row in _rows) {
+      final label = row.labelController.text.trim();
+      final min = double.tryParse(row.minController.text.trim());
+      final max = double.tryParse(row.maxController.text.trim());
+
+      if (label.isEmpty && min == null && max == null) {
+        continue;
+      }
+
+      if (label.isEmpty || min == null || max == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Each score filter needs a label, min, and max value.',
+            ),
+          ),
+        );
+        return;
+      }
+
+      if (min < 0 || min > 1 || max < 0 || max > 1) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Score ranges must stay between 0 and 1.'),
+          ),
+        );
+        return;
+      }
+
+      filters.add(ScoreFilter(label: label, min: min, max: max));
+    }
+
+    widget.onApply(filters);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              post.title,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF1F1A17),
-              ),
+              'Score-range query widget',
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
-            const SizedBox(height: 12),
-            Text(post.preview, style: theme.textTheme.bodyLarge),
+            const SizedBox(height: 8),
+            Text(
+              'Build one or more score filters using labels like optimism or nsfw. Values are inclusive and can be entered in either order.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
             const SizedBox(height: 16),
+            ...List.generate(_rows.length, (index) {
+              final row = _rows[index];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: TextField(
+                        controller: row.labelController,
+                        decoration: const InputDecoration(
+                          labelText: 'Score label',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: row.minController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: const InputDecoration(
+                          labelText: 'Min',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: row.maxController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: const InputDecoration(
+                          labelText: 'Max',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => _removeRow(index),
+                      icon: const Icon(Icons.remove_circle_outline),
+                    ),
+                  ],
+                ),
+              );
+            }),
             Wrap(
-              spacing: 12,
-              runSpacing: 12,
+              spacing: 10,
+              runSpacing: 10,
               children: [
-                _PostMetaChip(label: post.creator),
-                _PostMetaChip(label: '${post.commentCount} comments'),
-                if (post.createdAt != null)
-                  _PostMetaChip(label: _formatDate(post.createdAt!)),
+                OutlinedButton(
+                  onPressed: _addRow,
+                  child: const Text('Add filter'),
+                ),
+                ElevatedButton(
+                  onPressed: _applyFilters,
+                  child: const Text('Apply filters'),
+                ),
+                TextButton(onPressed: _clearAll, child: const Text('Clear')),
               ],
             ),
-            if (post.tags.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: post.tags
-                    .map((tag) => Chip(label: Text('#$tag')))
-                    .toList(growable: false),
-              ),
-            ],
           ],
         ),
       ),
     );
   }
-
-  String _formatDate(DateTime date) {
-    final monthNames = <String>[
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-
-    return '${monthNames[date.month - 1]} ${date.day}, ${date.year}';
-  }
 }
 
-class _PostMetaChip extends StatelessWidget {
-  const _PostMetaChip({required this.label});
+class _FilterControllers {
+  _FilterControllers({String label = '', String min = '', String max = ''})
+    : labelController = TextEditingController(text: label),
+      minController = TextEditingController(text: min),
+      maxController = TextEditingController(text: max);
 
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF4EEE6),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: Color(0xFF6B625B),
-        ),
-      ),
+  factory _FilterControllers.fromFilter(ScoreFilter filter) {
+    return _FilterControllers(
+      label: filter.label,
+      min: filter.min.toString(),
+      max: filter.max.toString(),
     );
+  }
+
+  final TextEditingController labelController;
+  final TextEditingController minController;
+  final TextEditingController maxController;
+
+  void clear() {
+    labelController.clear();
+    minController.clear();
+    maxController.clear();
+  }
+
+  void dispose() {
+    labelController.dispose();
+    minController.dispose();
+    maxController.dispose();
   }
 }
