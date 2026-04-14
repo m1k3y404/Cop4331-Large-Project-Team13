@@ -4,7 +4,8 @@ interface IPost {
   title: string;
   content: string;
   creator: string;
-  sentimentScores: string[];
+  scores: Record<string, number>;
+  isAnalyzed: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -13,10 +14,8 @@ const postSchema = new Schema<IPost>({
   title: { type: String, required: true, trim: true, minlength: 1 },
   content: { type: String, required: true, trim: true, minlength: 1 },
   creator: { type: String, required: true, trim: true, minlength: 1 },
-  sentimentScores: { type: [{
-    label: { type: String, required: true },
-    score: { type: Number, required: true }
-  }], default: [] },
+  scores: { type: Map, of: Number, default: {} },
+  isAnalyzed: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

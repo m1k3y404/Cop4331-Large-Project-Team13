@@ -21,6 +21,13 @@
           "title": { "type": "string", "example": "My First Blog Post" },
           "content": { "type": "string", "example": "This is the body of the blog post." },
           "creator": { "type": "string", "example": "johndoe", "description": "Username of the post author" },
+          "scores": {
+            "type": "object",
+            "additionalProperties": { "type": "number", "minimum": 0, "maximum": 1 },
+            "example": { "optimism": 0.7, "nsfw": 0.2 },
+            "description": "Dynamic analyzer scores keyed by label"
+          },
+          "isAnalyzed": { "type": "boolean", "example": true },
           "tags": { "type": "array", "items": { "type": "string" }, "example": ["blog", "first", "post"], "description": "Auto-generated from title and content" },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" }
@@ -370,6 +377,65 @@
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" },
                 "example": { "error": "missing search query" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/filter-by-scores": {
+      "get": {
+        "summary": "Filter posts by analyzer score ranges",
+        "description": "Returns posts whose stored analyzer scores fall inside the requested inclusive ranges. Missing score labels do not exclude a post.",
+        "parameters": [
+          {
+            "name": "scoreFilters",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "[{\"label\":\"optimism\",\"range\":[0.5,0.8]},{\"label\":\"nsfw\",\"range\":[0.0,0.3]}]"
+            },
+            "description": "JSON-encoded array of score filters"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1, "example": 1 },
+            "description": "Page number"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 20, "maximum": 100, "example": 20 },
+            "description": "Posts per page (max 100)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of filtered posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "posts": { "type": "array", "items": { "$ref": "#/components/schemas/Post" } },
+                    "total": { "type": "integer", "example": 1 },
+                    "page": { "type": "integer", "example": 1 },
+                    "limit": { "type": "integer", "example": 20 }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid scoreFilters query",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "scoreFilters must be valid JSON" }
               }
             }
           }

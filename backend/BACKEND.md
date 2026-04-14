@@ -33,6 +33,12 @@ npm test
 Returns all posts newest first. Supports pagination.
 - `?page=1&limit=20` (defaults: page 1, 20 per page)
 
+**GET /api/posts/filter-by-scores**
+Returns posts filtered by score ranges, newest first. Supports pagination.
+- `?scoreFilters=[{"label":"optimism","range":[0.5,0.8]}]&page=1&limit=20`
+- Each range is inclusive and normalized if sent in reverse order
+- Missing score labels on a post do not exclude that post
+
 **POST /api/posts**
 Create a new post. Tags are generated automatically from the title and content.
 ```json

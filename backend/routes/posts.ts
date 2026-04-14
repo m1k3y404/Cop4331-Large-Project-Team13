@@ -4,6 +4,7 @@ import { Types, isValidObjectId } from 'mongoose';
 import { Post } from '../models/Post.js';
 import { Comment } from '../models/Comment.js';
 import { analyzePostInBackground } from '../utils/sentiment_analizer.js';
+import { parseScoreFilters, postMatchesScoreFilters } from '../utils/postScoreFilters.js';
 
 const router = express.Router();
 
@@ -14,6 +15,23 @@ function escapeRegex(str: string) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+async function attachCommentCounts<T extends { _id: unknown; toObject(): Record<string, unknown> }>(posts: T[]) {
+  const postIds = posts.map(p => p._id);
+  const commentCounts = await Comment.aggregate([
+    { $match: { postId: { $in: postIds } } },
+    { $group: { _id: '$postId', count: { $sum: 1 } } }
+  ]);
+  const countMap: Record<string, number> = {};
+  for (const row of commentCounts) {
+    countMap[String(row._id)] = row.count as number;
+  }
+
+  return posts.map(p => ({
+    ...p.toObject(),
+    commentCount: countMap[String(p._id)] ?? 0
+  }));
+}
+
 router.post('/', async (req: Request, res: Response) => {
   try {
     const { title, content, creator } = req.body as { title: string; content: string; creator: string };
@@ -21,7 +39,7 @@ router.post('/', async (req: Request, res: Response) => {
       res.status(400).json({ error: 'title, content, and creator are required' });
       return;
     }
-    const newPost = await Post.create({ title, content, creator, sentimentScores: [] });
+    const newPost = await Post.create({ title, content, creator, scores: {}, isAnalyzed: false });
     analyzePostInBackground(newPost._id.toString(), content);
     res.status(201).json(newPost);
   } catch (err) {
@@ -38,21 +56,33 @@ router.get('/', async (req: Request, res: Response) => {
       Post.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
       Post.countDocuments()
     ]);
-    const postIds = posts.map(p => p._id);
-    const commentCounts = await Comment.aggregate([
-      { $match: { postId: { $in: postIds } } },
-      { $group: { _id: '$postId', count: { $sum: 1 } } }
-    ]);
-    const countMap: Record<string, number> = {};
-    for (const row of commentCounts) {
-      countMap[String(row._id)] = row.count as number;
-    }
-    const result = posts.map(p => ({
-      ...p.toObject(),
-      commentCount: countMap[String(p._id)] ?? 0
-    }));
+    const result = await attachCommentCounts(posts);
     res.status(200).json({ posts: result, total, page, limit });
   } catch (err) {
+    res.status(500).json({ error: 'something went wrong' });
+  }
+});
+
+router.get('/filter-by-scores', async (req: Request, res: Response) => {
+  try {
+    const page = parseInt(req.query['page'] as string) || 1;
+    const limit = Math.min(parseInt(req.query['limit'] as string) || 20, 100);
+    const filters = parseScoreFilters(req.query['scoreFilters']);
+
+    const allPosts = await Post.find().sort({ createdAt: -1 });
+    const filteredPosts = allPosts.filter(post => postMatchesScoreFilters(post.scores, filters));
+    const total = filteredPosts.length;
+    const skip = (page - 1) * limit;
+    const paginatedPosts = filteredPosts.slice(skip, skip + limit);
+    const result = await attachCommentCounts(paginatedPosts);
+
+    res.status(200).json({ posts: result, total, page, limit });
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('scoreFilters')) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+
     res.status(500).json({ error: 'something went wrong' });
   }
 });
