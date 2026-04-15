@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
 import { User } from '../models/User.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/mailer.js';
-import { sign } from 'jsonwebtoken';
+import jwt = require("jsonwebtoken");
 
 const router = express.Router();
 // google client -dechante
@@ -94,7 +94,7 @@ router.post('/login', async (req: Request, res: Response) => {
       return;
     }
 
-    let token = sign({ username }, jwtSecret, { expiresIn: '72h' });
+    let token = jwt.sign({ username }, jwtSecret, { expiresIn: '72h' });
 
     res.status(200).json({ error: '', token });
   } catch (err) {
@@ -237,7 +237,7 @@ router.post('/google', async (req: Request, res: Response) => {
       await user.save();
     }
 
-    let token = sign({ username: user.username }, jwtSecret, { expiresIn: '72h' });
+    let token = jwt.sign({ username: user.username }, jwtSecret, { expiresIn: '72h' });
 
     res.status(200).json({ error: '', token });
   } catch (err) {

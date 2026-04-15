@@ -3,8 +3,9 @@ import type { Request, Response } from 'express';
 import { Types, isValidObjectId } from 'mongoose';
 import { Comment } from '../models/Comment.js';
 import { Post } from '../models/Post.js';
-import { verify, type JwtPayload } from 'jsonwebtoken';
+import jwt = require("jsonwebtoken");
 import { jwtSecret } from './login.js';
+import type { JwtPayload } from 'jsonwebtoken';
 
 const router = express.Router();
 
@@ -13,8 +14,8 @@ router.post('/', async (req: Request, res: Response) => {
     let username;
     try {
       const token = req.headers.authorization?.split(" ")[1] as string;
-      let jwt = verify(token, jwtSecret) as JwtPayload;
-      username = jwt['username'] as string;
+      let payload = jwt.verify(token, jwtSecret) as JwtPayload;
+      username = payload['username'] as string;
     } catch {
       res.status(403).json({ error: 'Unauthorized' });
       return;
@@ -61,8 +62,8 @@ router.delete('/:id', async (req: Request, res: Response) => {
     let username;
     try {
       const token = req.headers.authorization?.split(" ")[1] as string;
-      let jwt = verify(token, jwtSecret) as JwtPayload;
-      username = jwt['username'] as string;
+      let payload = jwt.verify(token, jwtSecret) as JwtPayload;
+      username = payload['username'] as string;
     } catch {
       res.status(403).json({ error: 'Unauthorized' });
       return;
