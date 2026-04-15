@@ -3,12 +3,25 @@ import type { Request, Response } from 'express';
 import { Types, isValidObjectId } from 'mongoose';
 import { Comment } from '../models/Comment.js';
 import { Post } from '../models/Post.js';
+import { verify, type JwtPayload } from 'jsonwebtoken';
+import { jwtSecret } from './login.js';
 
 const router = express.Router();
 
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { postId, creator, content } = req.body as { postId: string; creator: string; content: string };
+    let username;
+    try {
+      const token = req.headers.authorization?.split(" ")[1] as string;
+      let jwt = verify(token, jwtSecret) as JwtPayload;
+      username = jwt['username'] as string;
+    } catch {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const creator = username;
+    const { postId, content } = req.body as { postId: string; content: string };
     if (!postId || !creator || !content) {
       res.status(400).json({ error: 'postId, creator, and content are required' });
       return;
@@ -45,16 +58,34 @@ router.get('/:postId', async (req: Request, res: Response) => {
 
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
+    let username;
+    try {
+      const token = req.headers.authorization?.split(" ")[1] as string;
+      let jwt = verify(token, jwtSecret) as JwtPayload;
+      username = jwt['username'] as string;
+    } catch {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+
     const id = req.params['id'] as string;
     if (!isValidObjectId(id)) {
       res.status(400).json({ error: 'invalid id' });
       return;
     }
-    const comment = await Comment.findByIdAndDelete(id);
+
+    const comment = await Comment.findById(id);
     if (!comment) {
       res.status(404).json({ error: 'comment not found' });
       return;
     }
+    if (comment.creator != username) {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    await Comment.findByIdAndDelete(id);
+
     res.status(200).json({ error: '' });
   } catch (err) {
     res.status(500).json({ error: 'something went wrong' });

@@ -10,7 +10,7 @@ import { sign } from 'jsonwebtoken';
 const router = express.Router();
 // google client -dechante
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-const jwtSecret = process.env.JWT_SECRET as string;
+export const jwtSecret = process.env.JWT_SECRET as string;
 
 // register
 router.post('/register', async (req: Request, res: Response) => {
