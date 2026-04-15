@@ -3,7 +3,7 @@ import { Content } from "antd/es/layout/layout";
 import { useCallback, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://13.projectucf.software:3000";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "";
 
 export function ResetPassword() {
     const navigate = useNavigate();

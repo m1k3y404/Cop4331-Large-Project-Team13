@@ -3,7 +3,7 @@ import { Content } from "antd/es/layout/layout";
 import { useCallback, useState } from "react";
 import { Link } from "react-router";
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://13.projectucf.software:3000";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "";
 
 export function ForgotPassword() {
     const [submitting, setSubmitting] = useState(false);

@@ -17,7 +17,7 @@ export const sendVerificationEmail = async (to: string, token: string) => {
 
 export const sendPasswordResetEmail = async (to: string, token: string) => {
   // link goes to frontend page, not the POST api route -dechante
-  const frontend = process.env.FRONTEND_BASE_URL || 'http://13.projectucf.software';
+  const frontend = process.env.FRONTEND_BASE_URL || 'https://13.projectucf.software';
   const url = `${frontend}/reset-password?token=${token}`;
   await resend.emails.send({
     // resend setup -dechante

@@ -5,7 +5,8 @@ import { Link, useNavigate } from "react-router";
 import { GoogleLogin } from "@react-oauth/google";
 import { saveAuth } from "../utils/auth";
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://13.projectucf.software:3000";
+// relative URLs in prod, nginx proxies /api to backend. override VITE_API_BASE for local dev -dechante
+const API_BASE = import.meta.env.VITE_API_BASE ?? "";
 
 type AuthBody = { username: string; password: string };
 

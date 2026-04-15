@@ -52,7 +52,7 @@ router.post('/register', async (req: Request, res: Response) => {
 });
 
 // verify email -dechante
-const FRONTEND_BASE = process.env.FRONTEND_BASE_URL || 'http://13.projectucf.software';
+const FRONTEND_BASE = process.env.FRONTEND_BASE_URL || 'https://13.projectucf.software';
 router.get('/verify-email', async (req: Request, res: Response) => {
   try {
     const token = req.query.token;

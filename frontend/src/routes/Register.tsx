@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router";
 import { GoogleLogin } from "@react-oauth/google";
 import { saveAuth } from "../utils/auth";
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://13.projectucf.software:3000";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "";
 
 type RegisterBody = { username: string; email: string; password: string };
 
