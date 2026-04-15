@@ -1,8 +1,7 @@
-import { Button, Divider, Form, Input, Layout, message, Typography } from "antd";
+import { Button, Form, Input, Layout, message, Typography } from "antd";
 import { Content } from "antd/es/layout/layout";
 import { useCallback } from "react";
 import { useNavigate } from "react-router";
-import { GoogleLogin } from "@react-oauth/google";
 
 export function Register() {
     return (
@@ -39,25 +38,6 @@ export function RegisterForm() {
         }
     }, [messageApi, navigate]);
 
-    const submitGoogle = useCallback(async (credential: string) => {
-        const response = await fetch("http://13.projectucf.software:3000/api/users/google", {
-            method: "POST",
-            body: JSON.stringify({ credential }),
-            headers: {
-                "Content-Type": "application/json",
-            }
-        });
-
-        if (response.status == 200) {
-            const data = await response.json();
-            localStorage.setItem("token", "success");
-            localStorage.setItem("username", data.username);
-            navigate("/feed")
-        } else {
-            messageApi.error("Google Sign-Up Failed")
-        }
-    }, [messageApi, navigate]);
-
     return (
     <Form onFinish={submit}>
         {contextHolder}
@@ -74,15 +54,6 @@ export function RegisterForm() {
             <Button type="primary" htmlType="submit">
                 Submit
             </Button>
-        </Form.Item>
-        <Divider>or</Divider>
-        <Form.Item>
-            <GoogleLogin
-                onSuccess={(resp) => {
-                    if (resp.credential) submitGoogle(resp.credential);
-                }}
-                onError={() => messageApi.error("Google Sign-Up Failed")}
-            />
         </Form.Item>
     </Form>
     )

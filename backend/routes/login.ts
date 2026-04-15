@@ -48,7 +48,7 @@ router.post('/register', async (req: Request, res: Response) => {
   }
 });
 
-// verify email - clicked from email link, redirects to frontend page
+// verify email
 router.get('/verify-email', async (req: Request, res: Response) => {
   try {
     const token = req.query.token as string;
@@ -139,7 +139,7 @@ router.post('/reset-password', async (req: Request, res: Response) => {
   }
 });
 
-// google sign-in / sign-up
+// google auth -dechante
 router.post('/google', async (req: Request, res: Response) => {
   try {
     const { credential } = req.body;

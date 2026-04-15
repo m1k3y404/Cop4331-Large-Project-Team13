@@ -1,8 +1,7 @@
-import { Button, Divider, Form, Input, Layout, message, Typography } from "antd";
+import { Button, Form, Input, Layout, message, Typography } from "antd";
 import { Content } from "antd/es/layout/layout";
 import { useCallback } from "react";
 import { useNavigate } from "react-router";
-import { GoogleLogin } from "@react-oauth/google";
 
 export function Login() {
     return (
@@ -34,34 +33,12 @@ export function LoginForm() {
 
         if(response.status == 200) {
             localStorage.setItem("token", "success");
-            localStorage.setItem("username", body.username);
             navigate("/feed")
         } else {
             localStorage.removeItem("token");
             messageApi.error("Authentication Failed")
         }
     }, [messageApi, navigate]);
-
-    const submitGoogle = useCallback(async (credential: string) => {
-        const response = await fetch("http://13.projectucf.software:3000/api/users/google", {
-            method: "POST",
-            body: JSON.stringify({ credential }),
-            headers: {
-                "Content-Type": "application/json",
-            }
-        });
-
-        if (response.status == 200) {
-            const data = await response.json();
-            localStorage.setItem("token", "success");
-            localStorage.setItem("username", data.username);
-            navigate("/feed")
-        } else {
-            localStorage.removeItem("token");
-            messageApi.error("Google Sign-In Failed")
-        }
-    }, [messageApi, navigate]);
-
     return (
     <Form onFinish={submit}>
         {contextHolder}
@@ -75,15 +52,6 @@ export function LoginForm() {
             <Button type="primary" htmlType="submit">
                 Submit
             </Button>
-        </Form.Item>
-        <Divider>or</Divider>
-        <Form.Item>
-            <GoogleLogin
-                onSuccess={(resp) => {
-                    if (resp.credential) submitGoogle(resp.credential);
-                }}
-                onError={() => messageApi.error("Google Sign-In Failed")}
-            />
         </Form.Item>
     </Form>
     )
