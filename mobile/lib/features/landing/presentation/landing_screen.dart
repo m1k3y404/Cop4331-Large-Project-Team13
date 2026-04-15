@@ -232,8 +232,10 @@ class _LandingScreenState extends State<LandingScreen> {
                   TopBar(
                     title: 'Inkly',
                     subtitle:
-                        'Browse, write, search, and manage every post flow.',
-                    isLoggedIn: latestSession.isSignedIn,
+                        'Mobile branch build: browse, write, search, and manage every post flow.',
+                    isAuthReady: latestSession.isLoaded,
+                    isLoggedIn:
+                        latestSession.isLoaded && latestSession.isSignedIn,
                     username: latestSession.username,
                     onCreatePressed: _openWriter,
                     onMyPostsPressed: _openMyPosts,
@@ -250,7 +252,7 @@ class _LandingScreenState extends State<LandingScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Latest posts and score queries',
+                            'Latest posts, score queries, and JWT login',
                             style: Theme.of(context).textTheme.headlineMedium,
                           ),
                           const SizedBox(height: 10),

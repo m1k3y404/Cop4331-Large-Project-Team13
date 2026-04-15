@@ -135,7 +135,8 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
                   title: 'My posts',
                   subtitle:
                       'Everything returned by the user-specific posts endpoint.',
-                  isLoggedIn: session.isSignedIn,
+                  isAuthReady: session.isLoaded,
+                  isLoggedIn: session.isLoaded && session.isSignedIn,
                   username: session.username,
                   onBackPressed: () => Navigator.of(context).maybePop(),
                 ),

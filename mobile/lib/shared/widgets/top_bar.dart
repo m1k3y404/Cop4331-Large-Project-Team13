@@ -5,6 +5,7 @@ class TopBar extends StatelessWidget {
     super.key,
     required this.title,
     required this.subtitle,
+    this.isAuthReady = true,
     required this.isLoggedIn,
     required this.username,
     this.onBackPressed,
@@ -18,6 +19,7 @@ class TopBar extends StatelessWidget {
 
   final String title;
   final String subtitle;
+  final bool isAuthReady;
   final bool isLoggedIn;
   final String? username;
   final VoidCallback? onBackPressed;
@@ -78,47 +80,55 @@ class TopBar extends StatelessWidget {
           runSpacing: 10,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            if (onSearchPressed != null)
-              OutlinedButton(
-                onPressed: onSearchPressed,
-                child: const Text('Search'),
-              ),
-            if (isLoggedIn) ...[
-              if (onMyPostsPressed != null)
+            if (!isAuthReady)
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            else ...[
+              if (onSearchPressed != null)
                 OutlinedButton(
-                  onPressed: onMyPostsPressed,
-                  child: const Text('My posts'),
+                  onPressed: onSearchPressed,
+                  child: const Text('Search'),
                 ),
-              if (onCreatePressed != null)
-                ElevatedButton(
-                  onPressed: onCreatePressed,
-                  child: const Text('New post'),
-                ),
-              if (username != null)
-                Text(
-                  'Welcome $username',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1F1A17),
+              if (isLoggedIn) ...[
+                if (onMyPostsPressed != null)
+                  OutlinedButton(
+                    onPressed: onMyPostsPressed,
+                    child: const Text('My posts'),
                   ),
-                ),
-              if (onSignOutPressed != null)
-                TextButton(
-                  onPressed: onSignOutPressed,
-                  child: const Text('Sign out'),
-                ),
-            ] else ...[
-              if (onLoginPressed != null)
-                TextButton(
-                  onPressed: onLoginPressed,
-                  child: const Text('Login'),
-                ),
-              if (onRegisterPressed != null)
-                OutlinedButton(
-                  onPressed: onRegisterPressed,
-                  child: const Text('Register'),
-                ),
+                if (onCreatePressed != null)
+                  ElevatedButton(
+                    onPressed: onCreatePressed,
+                    child: const Text('New post'),
+                  ),
+                if (username != null)
+                  Text(
+                    'Welcome $username',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1F1A17),
+                    ),
+                  ),
+                if (onSignOutPressed != null)
+                  TextButton(
+                    onPressed: onSignOutPressed,
+                    child: const Text('Sign out'),
+                  ),
+              ] else ...[
+                if (onLoginPressed != null)
+                  TextButton(
+                    onPressed: onLoginPressed,
+                    child: const Text('Login'),
+                  ),
+                if (onRegisterPressed != null)
+                  OutlinedButton(
+                    onPressed: onRegisterPressed,
+                    child: const Text('Register'),
+                  ),
+              ],
             ],
           ],
         ),

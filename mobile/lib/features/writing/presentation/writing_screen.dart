@@ -140,7 +140,8 @@ class _WritingScreenState extends State<WritingScreen> {
                   subtitle: _isEditing
                       ? 'Update an existing post using the backend edit endpoint.'
                       : 'Compose a new post and send it straight to the backend.',
-                  isLoggedIn: session.isSignedIn,
+                  isAuthReady: session.isLoaded,
+                  isLoggedIn: session.isLoaded && session.isSignedIn,
                   username: session.username,
                   onBackPressed: () => Navigator.of(context).maybePop(),
                   onLoginPressed: () =>

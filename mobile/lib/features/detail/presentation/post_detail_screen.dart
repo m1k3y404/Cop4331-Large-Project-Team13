@@ -248,7 +248,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   title: 'Post detail',
                   subtitle:
                       'Full post content, scores, comments, and owner actions.',
-                  isLoggedIn: session.isSignedIn,
+                  isAuthReady: session.isLoaded,
+                  isLoggedIn: session.isLoaded && session.isSignedIn,
                   username: session.username,
                   onBackPressed: () => Navigator.of(context).maybePop(),
                   onLoginPressed: () =>

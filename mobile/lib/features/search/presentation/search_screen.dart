@@ -144,7 +144,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   title: 'Search posts',
                   subtitle:
                       'Run the backend search endpoint across titles, content, and tags.',
-                  isLoggedIn: session.isSignedIn,
+                  isAuthReady: session.isLoaded,
+                  isLoggedIn: session.isLoaded && session.isSignedIn,
                   username: session.username,
                   onBackPressed: () => Navigator.of(context).maybePop(),
                 ),
