@@ -13,6 +13,7 @@ class MemorySessionStore implements SessionStore {
   Future<void> clear() async {
     _state = const SessionState(
       username: null,
+      authToken: null,
       isSignedIn: false,
       isLoaded: true,
     );

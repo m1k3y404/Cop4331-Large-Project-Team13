@@ -32,6 +32,7 @@ class FileSessionStore implements SessionStore {
     if (!await _file.exists()) {
       return const SessionState(
         username: null,
+        authToken: null,
         isSignedIn: false,
         isLoaded: true,
       );
@@ -41,6 +42,7 @@ class FileSessionStore implements SessionStore {
     if (raw.trim().isEmpty) {
       return const SessionState(
         username: null,
+        authToken: null,
         isSignedIn: false,
         isLoaded: true,
       );
@@ -48,10 +50,16 @@ class FileSessionStore implements SessionStore {
 
     final json = jsonDecode(raw) as Map<String, dynamic>;
     final username = json['username'] as String?;
+    final authToken = json['authToken'] as String?;
 
     return SessionState(
       username: username,
-      isSignedIn: username != null && username.isNotEmpty,
+      authToken: authToken,
+      isSignedIn:
+          username != null &&
+          username.isNotEmpty &&
+          authToken != null &&
+          authToken.isNotEmpty,
       isLoaded: true,
     );
   }
@@ -64,7 +72,7 @@ class FileSessionStore implements SessionStore {
     }
 
     await _file.writeAsString(
-      jsonEncode({'username': state.username}),
+      jsonEncode({'username': state.username, 'authToken': state.authToken}),
       flush: true,
     );
   }

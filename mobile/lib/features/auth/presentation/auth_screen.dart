@@ -111,9 +111,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isLogin
-                              ? 'Welcome back'
-                              : 'Create your Tilt account',
+                          isLogin ? 'Welcome back' : 'Create your Tilt account',
                           style: theme.textTheme.headlineMedium,
                         ),
                         const SizedBox(height: 12),

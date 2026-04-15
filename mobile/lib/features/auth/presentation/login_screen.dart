@@ -41,11 +41,11 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      await services.usersRepository.login(
+      final authSession = await services.usersRepository.login(
         username: username,
         password: password,
       );
-      await services.sessionController.signIn(username);
+      await services.sessionController.signIn(authSession);
       if (!mounted) {
         return;
       }

@@ -1,5 +1,7 @@
 import 'package:mobile/app/app_services.dart';
+import 'package:mobile/shared/api/api_exception.dart';
 import 'package:mobile/shared/models/api_message.dart';
+import 'package:mobile/shared/models/auth_session.dart';
 import 'package:mobile/shared/models/comment.dart';
 import 'package:mobile/shared/models/post.dart';
 import 'package:mobile/shared/models/score_filter.dart';
@@ -168,17 +170,27 @@ class FakeCommentsRepository implements CommentsRepository {
 }
 
 class FakeUsersRepository implements UsersRepository {
+  FakeUsersRepository({this.loginToken = 'jwt-token'});
+
+  final String? loginToken;
+
   @override
   Future<ApiMessage> forgotPassword(String email) async {
     return const ApiMessage(error: '', message: 'Reset link sent.');
   }
 
   @override
-  Future<ApiMessage> login({
+  Future<AuthSession> login({
     required String username,
     required String password,
   }) async {
-    return const ApiMessage(error: '');
+    if (loginToken == null || loginToken!.isEmpty) {
+      throw const ApiException(
+        'Login succeeded but no JWT token was returned by the server.',
+      );
+    }
+
+    return AuthSession(username: username, token: loginToken!);
   }
 
   @override
@@ -213,7 +225,12 @@ Future<AppServices> createTestServices({
   final store = MemorySessionStore();
   if (username != null) {
     await store.write(
-      SessionState(username: username, isSignedIn: true, isLoaded: true),
+      SessionState(
+        username: username,
+        authToken: 'jwt-token',
+        isSignedIn: true,
+        isLoaded: true,
+      ),
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../models/auth_session.dart';
 import '../models/session_state.dart';
 import 'session_store.dart';
 
@@ -17,11 +18,13 @@ class SessionController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> signIn(String username) async {
-    final trimmed = username.trim();
+  Future<void> signIn(AuthSession session) async {
+    final trimmedUsername = session.username.trim();
+    final trimmedToken = session.token.trim();
     _state = SessionState(
-      username: trimmed,
-      isSignedIn: trimmed.isNotEmpty,
+      username: trimmedUsername,
+      authToken: trimmedToken,
+      isSignedIn: trimmedUsername.isNotEmpty && trimmedToken.isNotEmpty,
       isLoaded: true,
     );
     await _store.write(_state);
@@ -31,6 +34,7 @@ class SessionController extends ChangeNotifier {
   Future<void> signOut() async {
     _state = const SessionState(
       username: null,
+      authToken: null,
       isSignedIn: false,
       isLoaded: true,
     );

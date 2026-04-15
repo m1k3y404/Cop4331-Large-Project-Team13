@@ -21,15 +21,19 @@ class AppServices {
     SessionStore? sessionStore,
   }) {
     final client = httpClient ?? http.Client();
-    final apiClient = ApiClient(httpClient: client);
+    final sessionController = SessionController(
+      sessionStore ?? createDefaultSessionStore(),
+    );
+    final apiClient = ApiClient(
+      httpClient: client,
+      authTokenProvider: () => sessionController.state.authToken,
+    );
 
     return AppServices(
       postsRepository: ApiPostsRepository(apiClient),
       commentsRepository: ApiCommentsRepository(apiClient),
       usersRepository: ApiUsersRepository(apiClient),
-      sessionController: SessionController(
-        sessionStore ?? createDefaultSessionStore(),
-      ),
+      sessionController: sessionController,
       onDispose: client.close,
     );
   }

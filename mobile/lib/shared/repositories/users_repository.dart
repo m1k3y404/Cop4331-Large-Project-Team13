@@ -1,5 +1,7 @@
 import '../api/api_client.dart';
+import '../api/api_exception.dart';
 import '../models/api_message.dart';
+import '../models/auth_session.dart';
 
 abstract class UsersRepository {
   Future<ApiMessage> register({
@@ -7,7 +9,7 @@ abstract class UsersRepository {
     required String email,
     required String password,
   });
-  Future<ApiMessage> login({
+  Future<AuthSession> login({
     required String username,
     required String password,
   });
@@ -38,7 +40,7 @@ class ApiUsersRepository implements UsersRepository {
   }
 
   @override
-  Future<ApiMessage> login({
+  Future<AuthSession> login({
     required String username,
     required String password,
   }) async {
@@ -46,7 +48,10 @@ class ApiUsersRepository implements UsersRepository {
       '/api/users/login',
       body: {'username': username, 'password': password},
     );
-    return ApiMessage.fromJson(response as Map<String, dynamic>);
+    return _parseAuthSession(
+      response as Map<String, dynamic>,
+      fallbackUsername: username,
+    );
   }
 
   @override
@@ -77,5 +82,67 @@ class ApiUsersRepository implements UsersRepository {
       queryParameters: {'token': token},
     );
     return ApiMessage.fromJson(response as Map<String, dynamic>);
+  }
+
+  AuthSession _parseAuthSession(
+    Map<String, dynamic> json, {
+    required String fallbackUsername,
+  }) {
+    String? readString(dynamic value) {
+      final text = value?.toString().trim();
+      if (text == null || text.isEmpty) {
+        return null;
+      }
+      return text;
+    }
+
+    String? readTokenFrom(Map<String, dynamic>? source) {
+      if (source == null) {
+        return null;
+      }
+
+      return readString(
+        source['token'] ??
+            source['accessToken'] ??
+            source['access_token'] ??
+            source['jwt'],
+      );
+    }
+
+    String? readUsernameFrom(Map<String, dynamic>? source) {
+      if (source == null) {
+        return null;
+      }
+
+      final user = source['user'];
+      if (user is Map<String, dynamic>) {
+        final nestedUsername = readString(user['username'] ?? user['name']);
+        if (nestedUsername != null) {
+          return nestedUsername;
+        }
+      }
+
+      return readString(source['username'] ?? source['name']);
+    }
+
+    final nestedData = json['data'];
+    final token =
+        readTokenFrom(json) ??
+        (nestedData is Map<String, dynamic> ? readTokenFrom(nestedData) : null);
+
+    if (token == null) {
+      throw const ApiException(
+        'Login succeeded but no JWT token was returned by the server.',
+      );
+    }
+
+    final username =
+        readUsernameFrom(json) ??
+        (nestedData is Map<String, dynamic>
+            ? readUsernameFrom(nestedData)
+            : null) ??
+        fallbackUsername.trim();
+
+    return AuthSession(username: username, token: token);
   }
 }

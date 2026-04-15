@@ -6,11 +6,16 @@ import 'api_config.dart';
 import 'api_exception.dart';
 
 class ApiClient {
-  ApiClient({http.Client? httpClient, this.baseUrl = ApiConfig.baseUrl})
-    : _httpClient = httpClient ?? http.Client();
+  ApiClient({
+    http.Client? httpClient,
+    this.baseUrl = ApiConfig.baseUrl,
+    String? Function()? authTokenProvider,
+  }) : _authTokenProvider = authTokenProvider,
+       _httpClient = httpClient ?? http.Client();
 
   final http.Client _httpClient;
   final String baseUrl;
+  final String? Function()? _authTokenProvider;
 
   Uri _buildUri(String path, {Map<String, String>? queryParameters}) {
     final root = Uri.parse(baseUrl);
@@ -33,6 +38,7 @@ class ApiClient {
   }) async {
     final response = await _httpClient.get(
       _buildUri(path, queryParameters: queryParameters),
+      headers: _buildHeaders(),
     );
     return _decodeResponse(response);
   }
@@ -40,7 +46,7 @@ class ApiClient {
   Future<dynamic> post(String path, {Map<String, dynamic>? body}) async {
     final response = await _httpClient.post(
       _buildUri(path),
-      headers: {'Content-Type': 'application/json'},
+      headers: _buildHeaders(),
       body: jsonEncode(body ?? <String, dynamic>{}),
     );
     return _decodeResponse(response);
@@ -49,15 +55,27 @@ class ApiClient {
   Future<dynamic> put(String path, {Map<String, dynamic>? body}) async {
     final response = await _httpClient.put(
       _buildUri(path),
-      headers: {'Content-Type': 'application/json'},
+      headers: _buildHeaders(),
       body: jsonEncode(body ?? <String, dynamic>{}),
     );
     return _decodeResponse(response);
   }
 
   Future<dynamic> delete(String path) async {
-    final response = await _httpClient.delete(_buildUri(path));
+    final response = await _httpClient.delete(
+      _buildUri(path),
+      headers: _buildHeaders(),
+    );
     return _decodeResponse(response);
+  }
+
+  Map<String, String> _buildHeaders() {
+    final headers = <String, String>{'Content-Type': 'application/json'};
+    final authToken = _authTokenProvider?.call()?.trim();
+    if (authToken != null && authToken.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $authToken';
+    }
+    return headers;
   }
 
   dynamic _decodeResponse(http.Response response) {

@@ -117,4 +117,22 @@ void main() {
       ),
     );
   });
+
+  test(
+    'api client sends bearer token when session token is available',
+    () async {
+      final client = ApiClient(
+        baseUrl: 'http://localhost:3000',
+        authTokenProvider: () => 'jwt-token',
+        httpClient: MockClient((request) async {
+          expect(request.headers['Authorization'], 'Bearer jwt-token');
+          return http.Response(jsonEncode({'ok': true}), 200);
+        }),
+      );
+
+      final response = await client.get('/api/posts');
+
+      expect(response['ok'], true);
+    },
+  );
 }

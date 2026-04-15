@@ -107,4 +107,30 @@ void main() {
     expect(find.text('Great post!'), findsOneWidget);
     expect(find.text('Post comment'), findsOneWidget);
   });
+
+  testWidgets('login screen does not sign in without a jwt token', (
+    WidgetTester tester,
+  ) async {
+    final services = await createTestServices(
+      usersRepository: FakeUsersRepository(loginToken: null),
+    );
+
+    await tester.pumpWidget(BlogApp(services: services));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(TextButton, 'Login'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).first, 'writer');
+    await tester.enterText(find.byType(TextField).last, 'password');
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Login'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Welcome writer'), findsNothing);
+    expect(find.text('Login'), findsWidgets);
+    expect(
+      find.text('Login succeeded but no JWT token was returned by the server.'),
+      findsOneWidget,
+    );
+  });
 }
