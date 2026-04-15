@@ -137,4 +137,25 @@ router.post('/reset-password', async (req: Request, res: Response) => {
   }
 });
 
+router.get('/user/:username', async (req: Request, res: Response) => {
+  try {
+    const username = req.params['username'] as string;
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    const userRes = {
+      username: user.username,
+      isVerified: user.isVerified
+    }
+
+    res.json(userRes);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+})
+
 export default router;
