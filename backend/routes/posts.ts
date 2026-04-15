@@ -5,6 +5,8 @@ import { Post } from '../models/Post.js';
 import { Comment } from '../models/Comment.js';
 import { analyzePostInBackground } from '../utils/sentiment_analizer.js';
 import { parseScoreFilters, postMatchesScoreFilters } from '../utils/postScoreFilters.js';
+import { verify, type JwtPayload } from 'jsonwebtoken';
+import { jwtSecret } from './login.js';
 
 const router = express.Router();
 
@@ -34,7 +36,18 @@ async function attachCommentCounts<T extends { _id: unknown; toObject(): Record<
 
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { title, content, creator } = req.body as { title: string; content: string; creator: string };
+    let username;
+    try {
+      const token = req.headers.authorization?.split(" ")[1] as string;
+      let jwt = verify(token, jwtSecret) as JwtPayload;
+      username = jwt['username'] as string;
+    } catch {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const creator = username;
+    const { title, content } = req.body as { title: string; content: string; };
     if (!title || !content || !creator) {
       res.status(400).json({ error: 'title, content, and creator are required' });
       return;
@@ -134,14 +147,24 @@ router.get('/:id', async (req: Request, res: Response) => {
 
 router.put('/:id', async (req: Request, res: Response) => {
   try {
+    let username;
+    try {
+      const token = req.headers.authorization?.split(" ")[1] as string;
+      let jwt = verify(token, jwtSecret) as JwtPayload;
+      username = jwt['username'] as string;
+    } catch {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+
     const id = req.params['id'] as string;
     if (!isValidObjectId(id)) {
       res.status(400).json({ error: 'invalid id' });
       return;
     }
-    const { title, content, creator } = req.body as { title: string; content: string; creator: string };
-    if (!title || !content || !creator) {
-      res.status(400).json({ error: 'title, content, and creator are required' });
+    const { title, content } = req.body as { title: string; content: string };
+    if (!title || !content) {
+      res.status(400).json({ error: 'title, content are required' });
       return;
     }
     const post = await Post.findById(id);
@@ -149,7 +172,7 @@ router.put('/:id', async (req: Request, res: Response) => {
       res.status(404).json({ error: 'post not found' });
       return;
     }
-    if (post.creator !== creator) {
+    if (post.creator !== username) {
       res.status(403).json({ error: 'not authorized' });
       return;
     }
@@ -165,16 +188,32 @@ router.put('/:id', async (req: Request, res: Response) => {
 
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
+    let username;
+    try {
+      const token = req.headers.authorization?.split(" ")[1] as string;
+      let jwt = verify(token, jwtSecret) as JwtPayload;
+      username = jwt['username'] as string;
+    } catch {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+
     const id = req.params['id'] as string;
     if (!isValidObjectId(id)) {
       res.status(400).json({ error: 'invalid id' });
       return;
     }
-    const post = await Post.findByIdAndDelete(id);
-    if (!post) {
+
+    let post = await Post.findById(id);
+    if(!post) {
       res.status(404).json({ error: 'post not found' });
       return;
     }
+    if(post.creator != username) {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+    await Post.findByIdAndDelete(id);
     await Comment.deleteMany({ postId: new Types.ObjectId(id) });
     res.status(200).json({ error: '' });
   } catch (err) {

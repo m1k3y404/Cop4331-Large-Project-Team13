@@ -5,11 +5,12 @@ import crypto from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
 import { User } from '../models/User.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/mailer.js';
-
+import { sign } from 'jsonwebtoken';
 
 const router = express.Router();
 // google client -dechante
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+export const jwtSecret = process.env.JWT_SECRET as string;
 
 // register
 router.post('/register', async (req: Request, res: Response) => {
@@ -93,7 +94,9 @@ router.post('/login', async (req: Request, res: Response) => {
       return;
     }
 
-    res.status(200).json({ error: '' });
+    let token = sign({ username }, jwtSecret, { expiresIn: '72h' });
+
+    res.status(200).json({ error: '', token });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
@@ -234,7 +237,9 @@ router.post('/google', async (req: Request, res: Response) => {
       await user.save();
     }
 
-    res.status(200).json({ error: '', username: user.username, email: user.email });
+    let token = sign({ username: user.username }, jwtSecret, { expiresIn: '72h' });
+
+    res.status(200).json({ error: '', token });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
