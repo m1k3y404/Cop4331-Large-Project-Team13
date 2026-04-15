@@ -19,6 +19,7 @@ export function Index() {
                 <Nav />
                 <Hero />
                 <FeatureStrip />
+                <Collage />
                 <PostsStream />
                 <Footer />
             </Content>
@@ -328,6 +329,187 @@ function PostsStream() {
                 ))}
             </motion.div>
         </section>
+    );
+}
+
+// scroll-scrubbed typographic collage, each token fades in tied to scroll position -dechante
+type Token =
+    | { kind: "word"; text: string; italic?: boolean; accent?: boolean }
+    | { kind: "pill" | "arch" | "chooseCompound" };
+
+const COLLAGE_TOKENS: Token[] = [
+    { kind: "word", text: "Every" }, { kind: "word", text: "feed" }, { kind: "word", text: "sounds" },
+    { kind: "word", text: "the" }, { kind: "word", text: "same." },
+    { kind: "word", text: "Tilt", italic: true, accent: true }, { kind: "word", text: "doesn't.", italic: true, accent: true },
+    { kind: "pill" },
+    { kind: "word", text: "You" }, { kind: "word", text: "post" }, { kind: "word", text: "a" },
+    { kind: "word", text: "take," }, { kind: "word", text: "read" }, { kind: "word", text: "a" },
+    { kind: "word", text: "dissent," }, { kind: "word", text: "follow" }, { kind: "word", text: "the" },
+    { kind: "word", text: "voice", italic: true, accent: true }, { kind: "word", text: "that" }, { kind: "word", text: "lands." },
+    { kind: "word", text: "You" }, { kind: "word", text: "don't" }, { kind: "word", text: "scroll." },
+    { kind: "word", text: "You" }, { kind: "chooseCompound" }, { kind: "word", text: "what" },
+    { kind: "word", text: "speaks.", accent: true },
+    { kind: "word", text: "Quiet" }, { kind: "word", text: "writing" },
+    { kind: "arch" },
+    { kind: "word", text: "for" }, { kind: "word", text: "people" }, { kind: "word", text: "who'd" },
+    { kind: "word", text: "rather" }, { kind: "word", text: "think" }, { kind: "word", text: "than" },
+    { kind: "word", text: "shout." },
+];
+
+// purple gradient pill + eye-closeup for "oo" + moody archway, picked to match tilt's dark accent theme -dechante
+const PILL_URL = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80";
+const DOT_URL = "https://images.unsplash.com/photo-1500353391678-d7b57979d6d2?w=400&auto=format&fit=crop&q=80";
+const ARCH_URL = "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&auto=format&fit=crop&q=80";
+
+function Collage() {
+    const ref = useRef<HTMLDivElement>(null);
+    const reduced = useReducedMotion();
+    // reveal completes while section is still in view so page end doesnt cut it off -dechante
+    const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.95", "end 0.7"] });
+    const total = COLLAGE_TOKENS.length;
+
+    return (
+        <section
+            ref={ref}
+            style={{
+                padding: "160px 48px 140px",
+                textAlign: "center",
+                position: "relative",
+                borderTop: "1px solid var(--border)",
+            }}
+        >
+            <style>{`
+                .collage-img { filter: grayscale(1); transition: filter 0.4s ease, transform 0.4s ease; }
+                .collage-img:hover { filter: grayscale(0); transform: scale(1.05); }
+            `}</style>
+            <p
+                style={{
+                    maxWidth: "20ch",
+                    margin: "0 auto",
+                    fontSize: "clamp(40px, 6vw, 88px)",
+                    lineHeight: 1.1,
+                    letterSpacing: "-2px",
+                    color: "var(--text-h)",
+                    fontWeight: 500,
+                    fontFamily: "var(--heading)",
+                }}
+            >
+                {COLLAGE_TOKENS.map((token, i) => (
+                    <CollageToken
+                        key={i}
+                        token={token}
+                        index={i}
+                        total={total}
+                        scrollYProgress={scrollYProgress}
+                        reduced={!!reduced}
+                    />
+                ))}
+            </p>
+        </section>
+    );
+}
+
+function CollageToken({
+    token,
+    index,
+    total,
+    scrollYProgress,
+    reduced,
+}: {
+    token: Token;
+    index: number;
+    total: number;
+    scrollYProgress: ReturnType<typeof useScroll>["scrollYProgress"];
+    reduced: boolean;
+}) {
+    // each token starts fading in at its own scroll slice and finishes a bit later so consecutive tokens overlap -dechante
+    const span = 1 / total;
+    const start = index * span;
+    const end = Math.min(1, start + span * 2.5);
+    const opacity = useTransform(scrollYProgress, [start, end], reduced ? [1, 1] : [0.12, 1]);
+    const y = useTransform(scrollYProgress, [start, end], reduced ? [0, 0] : [8, 0]);
+
+    if (token.kind === "word") {
+        const italicStyle: React.CSSProperties = token.italic
+            ? { fontFamily: "Georgia, 'Times New Roman', serif", fontStyle: "italic", fontWeight: 400 }
+            : {};
+        const colorStyle: React.CSSProperties = token.accent ? { color: "var(--accent)" } : {};
+        return (
+            <>
+                <motion.span style={{ opacity, y, display: "inline-block", ...italicStyle, ...colorStyle }}>
+                    {token.text}
+                </motion.span>{" "}
+            </>
+        );
+    }
+
+    if (token.kind === "pill") {
+        return (
+            <motion.span
+                aria-hidden="true"
+                className="collage-img"
+                style={{
+                    opacity,
+                    y,
+                    display: "inline-block",
+                    width: "14vw",
+                    height: "5vw",
+                    minHeight: 52,
+                    borderRadius: "5vw",
+                    backgroundImage: `url(${PILL_URL})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    verticalAlign: "middle",
+                    margin: "0 0.25em",
+                }}
+            />
+        );
+    }
+
+    if (token.kind === "chooseCompound") {
+        const dotStyle: React.CSSProperties = {
+            display: "inline-block",
+            width: "0.9em",
+            height: "0.9em",
+            borderRadius: "50%",
+            backgroundImage: `url(${DOT_URL})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            verticalAlign: "baseline",
+            margin: "0 0.02em",
+        };
+        return (
+            <>
+                <motion.span style={{ opacity, y, display: "inline-block" }}>
+                    ch
+                    <span aria-hidden="true" className="collage-img" style={dotStyle} />
+                    <span aria-hidden="true" className="collage-img" style={dotStyle} />
+                    se
+                </motion.span>{" "}
+            </>
+        );
+    }
+
+    // arch
+    return (
+        <motion.span
+            aria-hidden="true"
+            className="collage-img"
+            style={{
+                opacity,
+                y,
+                display: "inline-block",
+                width: "1.2em",
+                height: "1.5em",
+                borderTopLeftRadius: "1.2em",
+                borderTopRightRadius: "1.2em",
+                backgroundImage: `url(${ARCH_URL})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                verticalAlign: "-0.25em",
+                margin: "0 0.08em",
+            }}
+        />
     );
 }
 
