@@ -3,6 +3,7 @@ import { Content } from "antd/es/layout/layout";
 import { useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { GoogleLogin } from "@react-oauth/google";
+import { saveAuth } from "../utils/auth";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://13.projectucf.software:3000";
 
@@ -77,8 +78,7 @@ export function LoginForm() {
             });
             if (response.status === 200) {
                 const data = await response.json();
-                localStorage.setItem("token", "success");
-                localStorage.setItem("username", data.username);
+                saveAuth(data);
                 navigate("/feed");
                 return;
             }
