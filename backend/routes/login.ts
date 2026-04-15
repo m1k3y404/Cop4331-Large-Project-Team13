@@ -1,12 +1,14 @@
 import express from 'express';
 import type { Request, Response } from 'express';
 import crypto from 'crypto';
+// google auth deps -dechante
 import { OAuth2Client } from 'google-auth-library';
 import { User } from '../models/User.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/mailer.js';
 
 
 const router = express.Router();
+// google client -dechante
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // register
@@ -48,14 +50,20 @@ router.post('/register', async (req: Request, res: Response) => {
   }
 });
 
-// verify email
+// verify email -dechante
+const FRONTEND_BASE = process.env.FRONTEND_BASE_URL || 'http://13.projectucf.software';
 router.get('/verify-email', async (req: Request, res: Response) => {
   try {
-    const token = req.query.token as string;
+    const token = req.query.token;
+    // reject empty / missing tokens, otherwise findOne could match any null token user -dechante
+    if (typeof token !== 'string' || token.length === 0) {
+      res.redirect(`${FRONTEND_BASE}/verify-email?status=error`);
+      return;
+    }
     const user = await User.findOne({ verificationToken: token });
 
     if (!user) {
-      res.redirect('/verify-email?status=error');
+      res.redirect(`${FRONTEND_BASE}/verify-email?status=error`);
       return;
     }
 
@@ -63,7 +71,7 @@ router.get('/verify-email', async (req: Request, res: Response) => {
     user.verificationToken = null;
     await user.save();
 
-    res.redirect('/verify-email?status=success');
+    res.redirect(`${FRONTEND_BASE}/verify-email?status=success`);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
@@ -198,21 +206,28 @@ router.post('/google', async (req: Request, res: Response) => {
     let user = await User.findOne({ $or: [{ googleId }, { email }] });
 
     if (!user) {
-      let baseUsername = (payload.name ?? email.split('@')[0] ?? 'user').replace(/\s+/g, '').toLowerCase();
-      let username = baseUsername;
+      // retry on username collision -dechante
+      const baseUsername = (payload.name ?? email.split('@')[0] ?? 'user').replace(/\s+/g, '').toLowerCase();
       let suffix = 0;
-      while (await User.findOne({ username })) {
-        suffix += 1;
-        username = `${baseUsername}${suffix}`;
+      while (true) {
+        const candidate = suffix === 0 ? baseUsername : `${baseUsername}${suffix}`;
+        try {
+          user = new User({ username: candidate, email, googleId, isVerified: true });
+          await user.save();
+          break;
+        } catch (err: any) {
+          if (err.code === 11000 && err.keyPattern?.username) {
+            suffix += 1;
+            continue;
+          }
+          // double-click race on email or googleId, look up the now-existing user instead -dechante
+          if (err.code === 11000 && (err.keyPattern?.email || err.keyPattern?.googleId)) {
+            const existing = await User.findOne({ $or: [{ googleId }, { email }] });
+            if (existing) { user = existing; break; }
+          }
+          throw err;
+        }
       }
-
-      user = new User({
-        username,
-        email,
-        googleId,
-        isVerified: true,
-      });
-      await user.save();
     } else if (!user.googleId) {
       user.googleId = googleId;
       user.isVerified = true;

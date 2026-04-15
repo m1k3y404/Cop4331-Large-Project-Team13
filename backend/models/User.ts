@@ -15,7 +15,8 @@ const userSchema = new Schema<IUser>({
   username: { type: String, required: true, unique: true, trim: true, minlength: 1},
   email: { type: String, required: true, unique: true },
   password: {type: String, default: null},
-  googleId: { type: String, default: null, unique: true, sparse: true },
+  // dedup in /google route -dechante
+  googleId: { type: String, default: null },
   isVerified: { type: Boolean, default: false },
   verificationToken: { type: String, default: null },
   resetPasswordToken: { type: String, default: null },

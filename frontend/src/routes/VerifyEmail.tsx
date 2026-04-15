@@ -1,45 +1,54 @@
-import { Card, Layout, Typography } from "antd";
+import { Card, Layout, Result, Space, Typography } from "antd";
 import { Content } from "antd/es/layout/layout";
-import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { CheckCircleFilled, CloseCircleFilled, MailOutlined } from "@ant-design/icons";
+import { Link, useSearchParams } from "react-router";
 
 export function VerifyEmail() {
-    const [searchParams,] = useSearchParams();
-    const navigate = useNavigate();
-    const [message, setMessage] = useState("Verification in progress...");
+    const [searchParams] = useSearchParams();
+    const status = searchParams.get("status");
 
-    const token = searchParams.get("token");
-    if(!token) {
-        setMessage("Verification failed.")
+    let body: React.ReactNode;
+
+    if (status === "success") {
+        body = (
+            <Result
+                icon={<CheckCircleFilled style={{ color: "#22c55e" }} />}
+                status="success"
+                title="Email verified"
+                subTitle="Your account is ready. You can log in now."
+                extra={<Link to="/login">Go to log in</Link>}
+            />
+        );
+    } else if (status === "error") {
+        body = (
+            <Result
+                icon={<CloseCircleFilled style={{ color: "#ef4444" }} />}
+                status="error"
+                title="Link invalid or expired"
+                subTitle="Request a new verification email by registering again, or contact support."
+                extra={<Link to="/register">Back to register</Link>}
+            />
+        );
+    } else {
+        body = (
+            <Space direction="vertical" size="middle" align="center" style={{ width: "100%", textAlign: "center" }}>
+                <MailOutlined style={{ fontSize: 48, color: "var(--accent, #aa3bff)" }} />
+                <Typography.Title level={3} style={{ margin: 0 }}>Check your email</Typography.Title>
+                <Typography.Text type="secondary">
+                    We sent you a verification link. Click it to activate your account, then log in.
+                </Typography.Text>
+                <Link to="/login">Back to log in</Link>
+            </Space>
+        );
     }
 
-    const verify = useCallback(async () => {
-        const verify_url = new URL("/api/users/verify-email");
-        verify_url.searchParams.set("token", token as string);
-
-        const response = await fetch(verify_url);
-        if(response.ok) {
-            navigate("/login")
-        } else {
-            setMessage("Verification failed.")
-        }
-    }, [setMessage, navigate, token])
-
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        verify()
-    }, [verify]);
-    
     return (
-        <Layout>
-            <Content style={{padding: '48px'}}>
-                <Typography.Title level={2}>
-                    Epic Blog App
-                </Typography.Title>
-                <Card>
-                    {message}
+        <Layout style={{ minHeight: "100dvh", background: "var(--bg)" }}>
+            <Content style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
+                <Card style={{ width: "100%", maxWidth: 480 }} variant="outlined">
+                    {body}
                 </Card>
             </Content>
         </Layout>
-    )
+    );
 }
