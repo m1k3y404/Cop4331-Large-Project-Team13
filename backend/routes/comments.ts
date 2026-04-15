@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import { Types, isValidObjectId } from 'mongoose';
 import { Comment } from '../models/Comment.js';
 import { Post } from '../models/Post.js';
-import jwt = require("jsonwebtoken");
+import * as jwt from 'jsonwebtoken';
 import { jwtSecret } from './login.js';
 import type { JwtPayload } from 'jsonwebtoken';
 

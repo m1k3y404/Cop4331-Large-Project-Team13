@@ -1,0 +1,149 @@
+import 'package:flutter/material.dart';
+
+import '../../../app/app_scope.dart';
+import '../../../app/router/app_router.dart';
+import '../../../shared/utils/error_formatting.dart';
+import '../../../shared/widgets/top_bar.dart';
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text;
+    final services = AppScope.of(context);
+
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Username and password are required.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final authSession = await services.usersRepository.login(
+        username: username,
+        password: password,
+      );
+      await services.sessionController.signIn(authSession);
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Logged in successfully.')));
+      Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(formatErrorMessage(error))));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+          children: [
+            TopBar(
+              title: 'Login',
+              subtitle:
+                  'Authenticate with the backend and persist a local username session.',
+              isLoggedIn: false,
+              username: null,
+              onBackPressed: () => Navigator.of(context).maybePop(),
+            ),
+            const SizedBox(height: 20),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: _usernameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Username',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _isSubmitting ? null : _submit,
+                      child: Text(_isSubmitting ? 'Logging in...' : 'Login'),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.of(
+                            context,
+                          ).pushNamed(AppRouter.registerRoute),
+                          child: const Text('Create account'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(
+                            context,
+                          ).pushNamed(AppRouter.forgotPasswordRoute),
+                          child: const Text('Forgot password'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(
+                            context,
+                          ).pushNamed(AppRouter.verifyEmailRoute),
+                          child: const Text('Verify email'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
