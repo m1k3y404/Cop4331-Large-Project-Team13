@@ -216,6 +216,52 @@
         }
       }
     },
+    "/api/users/google": {
+      "post": {
+        "summary": "Sign in or register with Google",
+        "description": "Verifies a Google ID token (from Google Identity Services on the frontend) and either creates a new account or logs in an existing user. New Google accounts are auto-verified (no email verification step).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "credential": { "type": "string", "description": "The Google ID token (JWT) returned by Google Identity Services on the frontend" }
+                },
+                "required": ["credential"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "" },
+                    "username": { "type": "string", "example": "johndoe" },
+                    "email": { "type": "string", "example": "johndoe@gmail.com" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid Google credential",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "Invalid Google token" }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/users/reset-password": {
       "post": {
         "summary": "Reset password",
