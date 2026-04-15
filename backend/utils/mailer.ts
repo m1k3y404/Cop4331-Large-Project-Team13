@@ -5,6 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export const sendVerificationEmail = async (to: string, token: string) => {
   const url = `${process.env.BASE_URL}/api/users/verify-email?token=${token}`;
   await resend.emails.send({
+    // resend setup -dechante
     from: 'Blog App <noreply@13.projectucf.software>',
     to,
     subject: 'Verify your email',
@@ -15,8 +16,11 @@ export const sendVerificationEmail = async (to: string, token: string) => {
 };
 
 export const sendPasswordResetEmail = async (to: string, token: string) => {
-  const url = `${process.env.BASE_URL}/api/users/reset-password?token=${token}`;
+  // link goes to frontend page, not the POST api route -dechante
+  const frontend = process.env.FRONTEND_BASE_URL || 'http://13.projectucf.software';
+  const url = `${frontend}/reset-password?token=${token}`;
   await resend.emails.send({
+    // resend setup -dechante
     from: 'Blog App <noreply@13.projectucf.software>',
     to,
     subject: 'Reset your password',

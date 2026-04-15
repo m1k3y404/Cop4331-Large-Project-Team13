@@ -258,6 +258,15 @@
                 "example": { "error": "Invalid Google token" }
               }
             }
+          },
+          "500": {
+            "description": "Server error or GOOGLE_CLIENT_ID env var missing",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "Google auth not configured" }
+              }
+            }
           }
         }
       }
