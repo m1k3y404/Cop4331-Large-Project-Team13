@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://13.projectucf.software:3000/api';
 
 export const postService = {
   async createPost(title: string, content: string, creator: string) {

@@ -1,11 +1,13 @@
 import express from 'express';
 import type { Request, Response } from 'express';
 import crypto from 'crypto';
+import { OAuth2Client } from 'google-auth-library';
 import { User } from '../models/User.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/mailer.js';
 
 
 const router = express.Router();
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // register
 router.post('/register', async (req: Request, res: Response) => {
@@ -46,14 +48,14 @@ router.post('/register', async (req: Request, res: Response) => {
   }
 });
 
-// verify email 
+// verify email - clicked from email link, redirects to frontend page
 router.get('/verify-email', async (req: Request, res: Response) => {
   try {
     const token = req.query.token as string;
     const user = await User.findOne({ verificationToken: token });
 
     if (!user) {
-      res.status(400).json({ error: 'Invalid or expired token' });
+      res.redirect('/verify-email?status=error');
       return;
     }
 
@@ -61,7 +63,7 @@ router.get('/verify-email', async (req: Request, res: Response) => {
     user.verificationToken = null;
     await user.save();
 
-    res.json({ error: '', message: 'Email verified! You can now log in.' });
+    res.redirect('/verify-email?status=success');
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
@@ -132,6 +134,71 @@ router.post('/reset-password', async (req: Request, res: Response) => {
     await user.save();
 
     res.json({ error: '', message: 'Password reset successful! You can now log in.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// google sign-in / sign-up
+router.post('/google', async (req: Request, res: Response) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      res.status(400).json({ error: 'Missing Google credential' });
+      return;
+    }
+
+    const audience = process.env.GOOGLE_CLIENT_ID;
+    if (!audience) {
+      res.status(500).json({ error: 'Google auth not configured' });
+      return;
+    }
+
+    let ticket;
+    try {
+      ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience,
+      });
+    } catch (verifyErr) {
+      res.status(400).json({ error: 'Invalid Google token' });
+      return;
+    }
+    const payload = ticket.getPayload();
+
+    if (!payload || !payload.email || !payload.sub) {
+      res.status(400).json({ error: 'Invalid Google token' });
+      return;
+    }
+
+    const email = payload.email;
+    const googleId = payload.sub;
+
+    let user = await User.findOne({ $or: [{ googleId }, { email }] });
+
+    if (!user) {
+      let baseUsername = (payload.name ?? email.split('@')[0] ?? 'user').replace(/\s+/g, '').toLowerCase();
+      let username = baseUsername;
+      let suffix = 0;
+      while (await User.findOne({ username })) {
+        suffix += 1;
+        username = `${baseUsername}${suffix}`;
+      }
+
+      user = new User({
+        username,
+        email,
+        googleId,
+        isVerified: true,
+      });
+      await user.save();
+    } else if (!user.googleId) {
+      user.googleId = googleId;
+      user.isVerified = true;
+      await user.save();
+    }
+
+    res.status(200).json({ error: '', username: user.username, email: user.email });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
