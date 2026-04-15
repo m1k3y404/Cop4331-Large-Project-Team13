@@ -13,6 +13,7 @@
   "type": "module",
   "dependencies": {
     "@ai-sdk/google": "^3.0.63",
+    "ai": "^6.0.161",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
