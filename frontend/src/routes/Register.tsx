@@ -23,7 +23,7 @@ export function RegisterForm() {
     const navigate = useNavigate()
 
     const submit = useCallback(async (body: RegisterBody) => {
-        const response = await fetch("http://13.projectucf.software:3000/api/users/register", {
+        const response = await fetch("/api/users/register", {
             method: "POST",
             body: JSON.stringify(body),
             headers: {
