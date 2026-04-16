@@ -156,6 +156,47 @@ button:not(:disabled):active,
   box-shadow: none;
 }
 
+/* AntD primary buttons — force readable contrast on dark bg -dechante */
+.ant-btn-primary:not(:disabled) {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+}
+.ant-btn-primary:not(:disabled):hover,
+.ant-btn-primary:not(:disabled):focus {
+  background: color-mix(in srgb, var(--accent) 85%, white) !important;
+  border-color: color-mix(in srgb, var(--accent) 85%, white) !important;
+}
+.ant-btn-default:not(:disabled) {
+  background: transparent !important;
+  border-color: var(--border) !important;
+  color: var(--text-h) !important;
+}
+.ant-btn-default:not(:disabled):hover {
+  border-color: var(--accent) !important;
+  color: var(--text-h) !important;
+}
+.ant-btn-dangerous.ant-btn-primary:not(:disabled) {
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #fff !important;
+}
+
+/* divider line in dark mode — AntD default is nearly invisible on dark bg -dechante */
+.ant-divider,
+.ant-divider-horizontal.ant-divider-with-text::before,
+.ant-divider-horizontal.ant-divider-with-text::after {
+  border-color: var(--border) !important;
+}
+
+/* disabled inputs stay legible (AntD mutes too far on dark) -dechante */
+.tilt-form .ant-input[disabled],
+.tilt-form .ant-input-affix-wrapper-disabled,
+.tilt-form .ant-input-password-disabled {
+  color: color-mix(in srgb, var(--text-h) 55%, transparent) !important;
+  background: var(--bg) !important;
+}
+
 /* style AntD primitives to match tilt palette -dechante */
 .tilt-form .ant-form-item-label > label {
   color: var(--text) !important;
