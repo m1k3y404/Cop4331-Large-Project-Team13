@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
 import { User } from '../models/User.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/mailer.js';
-import * as jwt from 'jsonwebtoken';
+import jwt = require("jsonwebtoken");
 
 const router = express.Router();
 // google client -dechante

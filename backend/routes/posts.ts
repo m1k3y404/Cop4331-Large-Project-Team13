@@ -5,7 +5,7 @@ import { Post } from '../models/Post.js';
 import { Comment } from '../models/Comment.js';
 import { analyzePostInBackground } from '../utils/sentiment_analizer.js';
 import { parseScoreFilters, postMatchesScoreFilters } from '../utils/postScoreFilters.js';
-import * as jwt from 'jsonwebtoken';
+import jwt = require("jsonwebtoken");
 import { jwtSecret } from './login.js';
 import type { JwtPayload } from 'jsonwebtoken';
 
