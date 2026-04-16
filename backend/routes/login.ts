@@ -48,6 +48,7 @@ router.post('/register', async (req: Request, res: Response) => {
       return;
     }
     res.status(500).json({ error: 'Server error' });
+    console.error(err.toString())
   }
 });
 
@@ -73,8 +74,9 @@ router.get('/verify-email', async (req: Request, res: Response) => {
     await user.save();
 
     res.redirect(`${FRONTEND_BASE}/verify-email?status=success`);
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: 'Server error' });
+    console.error(err.toString())
   }
 });
 
@@ -97,8 +99,9 @@ router.post('/login', async (req: Request, res: Response) => {
     let token = jwt.sign({ username }, jwtSecret, { expiresIn: '72h' });
 
     res.status(200).json({ error: '', token });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: 'Server error' });
+    console.error(err.toString())
   }
 });
 
@@ -120,8 +123,9 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
 
     await sendPasswordResetEmail(email, token);
     res.json({ error: '', message: 'If that email exists, a reset link has been sent.' });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: 'Server error' });
+    console.error(err.toString())
   }
 });
 
@@ -145,8 +149,9 @@ router.post('/reset-password', async (req: Request, res: Response) => {
     await user.save();
 
     res.json({ error: '', message: 'Password reset successful! You can now log in.' });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: 'Server error' });
+    console.error(err.toString())
   }
 });
 
@@ -166,8 +171,9 @@ router.get('/user/:username', async (req: Request, res: Response) => {
     }
 
     res.json(userRes);
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: 'Server error' });
+    console.error(err.toString())
   }
 })
 
@@ -240,8 +246,9 @@ router.post('/google', async (req: Request, res: Response) => {
     let token = jwt.sign({ username: user.username }, jwtSecret, { expiresIn: '72h' });
 
     res.status(200).json({ error: '', token });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: 'Server error' });
+    console.error(err.toString())
   }
 });
 
