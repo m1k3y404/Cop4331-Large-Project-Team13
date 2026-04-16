@@ -11,6 +11,11 @@ export interface IPost {
   updatedAt: Date;
 }
 
+export type ScoreFilter = {
+  label: string;
+  range: [number, number];
+};
+
 export type PostsResult = { posts: IPost[], total: number, page: number, limit: number };
 
 export const tokenService = {
@@ -46,6 +51,15 @@ export const postService = {
   async getPosts(page = 1, limit = 20): Promise<PostsResult> {
     const response = await fetch(`${API_BASE_URL}/posts?page=${page}&limit=${limit}`);
     if (!response.ok) throw new Error('Failed to fetch posts');
+    return response.json();
+  },
+
+  async getPostsByScores(scoreFilters: ScoreFilter[], page = 1, limit = 20): Promise<PostsResult> {
+    const encodedFilters = encodeURIComponent(JSON.stringify(scoreFilters));
+    const response = await fetch(
+      `${API_BASE_URL}/posts/filter-by-scores?page=${page}&limit=${limit}&scoreFilters=${encodedFilters}`
+    );
+    if (!response.ok) throw new Error('Failed to fetch filtered posts');
     return response.json();
   },
 

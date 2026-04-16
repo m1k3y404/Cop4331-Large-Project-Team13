@@ -3,7 +3,8 @@ import { Layout, Button, Space, Spin, message } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import PostCard from '../components/Feed/PostCard';
-import { postService, type IPost } from '../services/api';
+import TiltMenu from '../components/TiltMenu/TiltMenu';
+import { postService, type IPost, type ScoreFilter } from '../services/api';
 import '../assets/Feed.css';
 import Navbar from '../components/Navbar';
 
@@ -23,12 +24,16 @@ export function Feed() {
 const Body: React.FC = () => {
   const [posts, setPosts] = useState<IPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [appliedFilters, setAppliedFilters] = useState<ScoreFilter[]>([]);
   const navigate = useNavigate();
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (filters: ScoreFilter[]) => {
     try {
       setLoading(true);
-      const data = await postService.getPosts();
+      const data =
+        filters.length === 0
+          ? await postService.getPosts()
+          : await postService.getPostsByScores(filters);
       setPosts(data.posts || []);
     } catch {
       message.error('Failed to load posts');
@@ -38,8 +43,8 @@ const Body: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    fetchPosts(appliedFilters);
+  }, [appliedFilters]);
 
   return (
     <Layout>
@@ -47,7 +52,12 @@ const Body: React.FC = () => {
         <div className="feed-header">
           <h1>Posts Feed</h1>
           <Space>
-            <Button icon={<ReloadOutlined />} onClick={fetchPosts}>
+            <TiltMenu
+              appliedFilters={appliedFilters}
+              availableLabels={['optimism', 'nsfw']}
+              onApply={setAppliedFilters}
+            />
+            <Button icon={<ReloadOutlined />} onClick={() => fetchPosts(appliedFilters)}>
               Refresh
             </Button>
             <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/write')}>
