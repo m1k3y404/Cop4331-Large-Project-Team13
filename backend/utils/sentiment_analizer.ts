@@ -38,9 +38,11 @@ export const analyzePostInBackground = async (postId: string, content: string) =
       prompt: content,
     });
 
-    console.log(await Post.findByIdAndUpdate(postId, { 
-      scores: output,
-      isAnalyzed: true 
+    console.log(await Post.findByIdAndUpdate(postId, {
+      $set: {
+        scores: output,
+        isAnalyzed: true 
+      }
     }));
 
     console.log(`Successfully scored post: ${postId} with scores:`, output);
