@@ -4,6 +4,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
 import '../assets/Search.css';
+import Navbar from '../components/Navbar';
 
 const { Content } = Layout;
 
@@ -49,8 +50,9 @@ export default function Search() {
   };
 
   return (
-    <Layout>
-      <Content style={{ padding: '48px' }}>
+    <Layout style={{ background: "var(--bg)", minHeight: "100dvh", overflowX: "hidden" }}>
+      <Content>
+        <Navbar />
         <div className="search-header">
           <h1>Search Posts</h1>
           <Input.Search

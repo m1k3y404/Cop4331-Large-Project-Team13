@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 import PostCard from '../components/Feed/PostCard';
 import { postService, type IPost } from '../services/api';
 import '../assets/Feed.css';
-import Nav from '../components/Layout/Nav';
+import Navbar from '../components/Navbar';
 
 const { Content } = Layout;
 
@@ -13,7 +13,7 @@ export function Feed() {
     return (
         <Layout style={{ background: "var(--bg)", minHeight: "100dvh", overflowX: "hidden" }}>
             <Content>
-                <Nav />
+                <Navbar />
                 <Body />
             </Content>
         </Layout>
