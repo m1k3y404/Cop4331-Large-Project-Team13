@@ -1,7 +1,6 @@
 import { Layout, Menu, Button, Dropdown } from 'antd';
 import { useNavigate } from 'react-router';
 import { LogoutOutlined, HomeOutlined, SearchOutlined, FileTextOutlined } from '@ant-design/icons';
-import '../assets/Navbar.css';
 
 const { Header } = Layout;
 
