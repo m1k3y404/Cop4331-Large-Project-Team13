@@ -3,11 +3,11 @@ import { Form, Input, Button, Card, Space, message, Spin } from 'antd';
 import { SaveOutlined, ClearOutlined, HomeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import SentimentGauge from '../Sentiment/SentimentGauge';
-import { postService } from '../../services/api';
+import { postService, type IPost } from '../../services/api';
 import './PostEditor.css';
 
 interface PostEditorProps {
-  onSuccess?: (post: any) => void;
+  onSuccess?: (post: IPost) => void;
 }
 
 export const PostEditor: React.FC<PostEditorProps> = ({ onSuccess }) => {
@@ -23,9 +23,11 @@ export const PostEditor: React.FC<PostEditorProps> = ({ onSuccess }) => {
 
       const post = await postService.createPost(values.title, values.content, creator);
 
+      /*
       if (post.sentimentScore !== undefined) {
         setSentimentScore(post.sentimentScore);
       }
+      */
 
       message.success('Post created successfully!');
       form.resetFields();
