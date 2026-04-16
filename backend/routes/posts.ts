@@ -1,7 +1,7 @@
 import express from 'express';
 import type { Request, Response } from 'express';
 import { Types, isValidObjectId } from 'mongoose';
-import { Post } from '../models/Post.js';
+import { Post, type IPost } from '../models/Post.js';
 import { Comment } from '../models/Comment.js';
 import { analyzePostInBackground } from '../utils/sentiment_analizer.js';
 import { parseScoreFilters, postMatchesScoreFilters } from '../utils/postScoreFilters.js';
@@ -18,7 +18,7 @@ function escapeRegex(str: string) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-async function attachCommentCounts<T extends { _id: unknown; toObject(): Record<string, unknown> }>(posts: T[]) {
+async function attachCommentCounts<T extends { _id: unknown; } & IPost>(posts: T[]) {
   const postIds = posts.map(p => p._id);
   const commentCounts = await Comment.aggregate([
     { $match: { postId: { $in: postIds } } },
@@ -30,7 +30,8 @@ async function attachCommentCounts<T extends { _id: unknown; toObject(): Record<
   }
 
   return posts.map(p => ({
-    ...p.toObject(),
+    ...p,
+    scores: p.scores,
     commentCount: countMap[String(p._id)] ?? 0
   }));
 }
