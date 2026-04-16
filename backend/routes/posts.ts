@@ -55,7 +55,7 @@ router.post('/', async (req: Request, res: Response) => {
       return;
     }
     const newPost = await Post.create({ title, content, creator, scores: {}, isAnalyzed: false });
-    analyzePostInBackground(newPost._id.toString(), title + '/n' + content);
+    analyzePostInBackground(newPost._id.toString(), title + '\n' + content);
     res.status(201).json(newPost);
   } catch (err) {
     res.status(500).json({ error: 'something went wrong' });
@@ -189,6 +189,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     post.title = title;
     post.content = content;
     post.updatedAt = new Date();
+    analyzePostInBackground(post._id.toString(), title + '\n' + content);
     await post.save();
     res.status(200).json(post);
   } catch (err) {
