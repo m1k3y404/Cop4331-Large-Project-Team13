@@ -43,6 +43,9 @@ export const analyzePostInBackground = async (postId: string, content: string) =
         scores: output,
         isAnalyzed: true 
       }
+    }, {
+      new: true,
+      runValidators: true
     }));
 
     console.log(`Successfully scored post: ${postId} with scores:`, output);
