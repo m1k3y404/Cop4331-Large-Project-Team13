@@ -4,6 +4,7 @@ import './index.css'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { Index } from './routes/Index.tsx'
+import { ConfigProvider, theme } from 'antd'
 
 // route-split everything except landing so first paint only ships the hero + collage -dechante
 const Login = lazy(() => import('./routes/Login.tsx').then(m => ({ default: m.Login })))
@@ -34,6 +35,7 @@ function RouteFallback() {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+      <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}></ConfigProvider>
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <BrowserRouter>
         <Suspense fallback={<RouteFallback />}>
