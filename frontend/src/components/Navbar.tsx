@@ -32,21 +32,29 @@ export default function Navbar() {
   return (
     <Header
       style={{
-        background: '#001529',
+        background: '#16171d',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '0 24px',
       }}
     >
-      <div onClick={() => navigate('/')} style={{ cursor: 'pointer', fontSize: '20px', fontWeight: 'bold', color: 'white' }}>
-        📝 Blog
+      <div 
+        onClick={() => navigate('/')} 
+        style={{ cursor: 'pointer', fontSize: '20px', fontWeight: 'bold', color: 'white', minWidth: 120, display: 'flex', alignItems: 'center' }}
+      >
+        tilt<span style={{ color: '#c084fc' }}>.</span>
       </div>
 
       <Menu
         theme="dark"
         mode="horizontal"
-        style={{ flex: 1, justifyContent: 'center' }}
+        style={{ 
+          flex: 1, 
+          justifyContent: 'center', 
+          background: 'none',
+          borderBottom: 'none' 
+        }}
         onClick={(e) => {
           if (e.key === 'feed') navigate('/feed');
           if (e.key === 'search') navigate('/search');
@@ -64,11 +72,14 @@ export default function Navbar() {
         </Menu.Item>
       </Menu>
 
-      <Dropdown menu={{ items: [{ key: 'user', label: `👤 ${username}`, disabled: true }, { type: 'divider' }, { key: 'logout', label: 'Logout', icon: <LogoutOutlined />, onClick: handleLogout }] }}>
-        <Button type="text" style={{ color: 'white' }}>
-          Hello, {username}!
-        </Button>
-      </Dropdown>
+
+      <div style={{ minWidth: 120, display: 'flex', justifyContent: 'flex-end' }}>
+        <Dropdown menu={{ items: [{ key: 'user', label: `👤 ${username}`, disabled: true }, { type: 'divider' }, { key: 'logout', label: 'Logout', icon: <LogoutOutlined />, onClick: handleLogout }] }}>
+          <Button type="text" style={{ color: 'white' }}>
+            Hello, {username}!
+          </Button>
+        </Dropdown>
+      </div>
     </Header>
   );
 }
