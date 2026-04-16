@@ -13,11 +13,20 @@ export interface IPost {
 
 export type PostsResult = { posts: IPost[], total: number, page: number, limit: number };
 
+export const tokenService = {
+  getToken(): string | null {
+    return localStorage.getItem("token")
+  },
+  getUsername(): string | null {
+    return localStorage.getItem("username")
+  }
+}
+
 export const postService = {
   async createPost(title: string, content: string, creator: string): Promise<IPost> {
     const response = await fetch(`${API_BASE_URL}/posts`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', "Authorization": "Bearer " + tokenService.getToken() },
       body: JSON.stringify({ title, content, creator }),
     });
     if (!response.ok) throw new Error('Failed to create post');
