@@ -16,7 +16,7 @@ export const SentimentGauge: React.FC<SentimentGaugeProps> = ({ score, label = '
   };
 
   const getSentimentLabel = (value: number) => {
-    return Math.round(value*5).toString()
+    return Math.round(value*10).toString()
   };
 
   return (
