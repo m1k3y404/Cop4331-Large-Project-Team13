@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Card, Space, message, Spin } from 'antd';
 import { SaveOutlined, ClearOutlined, HomeOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import SentimentGauge from '../Sentiment/SentimentGauge';
 import { postService, type IPost } from '../../services/api';
 import './PostEditor.css';
@@ -14,7 +14,22 @@ export const PostEditor: React.FC<PostEditorProps> = ({ onSuccess }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [sentimentScore, setSentimentScore] = useState<number | null>(null);
+  const [searchParams,] = useSearchParams();
   const navigate = useNavigate();
+
+  const id = searchParams.get("id")
+
+  useEffect(() => {
+    (async () => {
+      if(!id) {
+        return
+      }
+      setLoading(true);
+      const post = await postService.getPost(id);
+      form.setFieldsValue(post)
+      setLoading(false)
+    })()
+  }, [form, id])
 
   const handleSubmit = async (values: any) => {
     try {

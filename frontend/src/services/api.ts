@@ -38,4 +38,21 @@ export const postService = {
     if (!response.ok) throw new Error('Failed to fetch posts');
     return response.json();
   },
+
+  async getPost(id: string): Promise<IPost> {
+    const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json'}
+    });
+    if (!response.ok) throw new Error('Failed to delete post');
+    return await response.json()
+  },
+
+  async deletePost(id: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', "Authorization": "Bearer " + tokenService.getToken() }
+    });
+    if (!response.ok) throw new Error('Failed to delete post');
+  }
 };

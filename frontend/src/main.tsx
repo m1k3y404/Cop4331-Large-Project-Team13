@@ -10,7 +10,7 @@ import { Index } from './routes/Index.tsx'
 import { VerifyEmail } from './routes/VerifyEmail.tsx'
 import { ForgotPassword } from './routes/ForgotPassword.tsx'
 import { ResetPassword } from './routes/ResetPassword.tsx'
-import Editor from './pages/Editor.tsx'
+import Editor from './routes/Editor.tsx'
 import Feed from './routes/Feed.tsx'
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string
