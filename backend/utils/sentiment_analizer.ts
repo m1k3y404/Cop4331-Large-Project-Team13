@@ -38,10 +38,10 @@ export const analyzePostInBackground = async (postId: string, content: string) =
       prompt: content,
     });
 
-    await Post.findByIdAndUpdate(postId, { 
-      scores: new Map(Object.entries(output)),
+    console.log(await Post.findByIdAndUpdate(postId, { 
+      scores: output,
       isAnalyzed: true 
-    });
+    }));
 
     console.log(`Successfully scored post: ${postId} with scores:`, output);
   } catch (error) {
