@@ -100,8 +100,8 @@ router.post('/login', async (req: Request, res: Response) => {
 
     res.status(200).json({ error: '', token });
   } catch (err: any) {
+    console.log(err.toString())
     res.status(500).json({ error: 'Server error' });
-    console.error(err.toString())
   }
 });
 
