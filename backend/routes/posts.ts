@@ -18,7 +18,7 @@ function escapeRegex(str: string) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-async function attachCommentCounts<T extends { _id: unknown; } & IPost>(posts: T[]) {
+async function attachCommentCounts<T extends { _id: unknown; toObject(): Record<string, unknown> } & IPost>(posts: T[]) {
   const postIds = posts.map(p => p._id);
   const commentCounts = await Comment.aggregate([
     { $match: { postId: { $in: postIds } } },
@@ -30,7 +30,7 @@ async function attachCommentCounts<T extends { _id: unknown; } & IPost>(posts: T
   }
 
   return posts.map(p => ({
-    ...p,
+    ...p.toObject(),
     scores: p.scores,
     commentCount: countMap[String(p._id)] ?? 0
   }));
