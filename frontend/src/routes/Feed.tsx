@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Button, Space, Spin, message } from 'antd';
+import { Layout, Button, Space, Spin, message, Typography } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import PostCard from '../components/Feed/PostCard';
@@ -11,14 +11,16 @@ import Navbar from '../components/Navbar';
 const { Content } = Layout;
 
 export function Feed() {
-    return (
-        <Layout style={{ background: "var(--bg)", minHeight: "100dvh", overflowX: "hidden" }}>
-            <Content>
-                <Navbar />
-                <Body />
-            </Content>
-        </Layout>
-    );
+  return (
+    <Layout style={{ background: 'var(--bg)', minHeight: '100dvh', overflowX: 'hidden' }}>
+      <Content>
+        <div style={{ borderBottom: '1px solid var(--border)' }}>
+          <Navbar />
+        </div>
+        <Body />
+      </Content>
+    </Layout>
+  );
 }
 
 const Body: React.FC = () => {
@@ -47,30 +49,39 @@ const Body: React.FC = () => {
   }, [appliedFilters]);
 
   return (
-    <Layout>
-      <Content style={{ padding: '48px' }}>
-        <div className="feed-header">
-          <h1>Posts Feed</h1>
-          <Space>
-            <TiltMenu
-              appliedFilters={appliedFilters}
-              availableLabels={['optimism', 'nsfw']}
-              onApply={setAppliedFilters}
-            />
-            <Button icon={<ReloadOutlined />} onClick={() => fetchPosts(appliedFilters)}>
-              Refresh
-            </Button>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/write')}>
-              New Post
-            </Button>
-          </Space>
-        </div>
-
-        <Spin spinning={loading}>
-          {posts.length === 0 ? (
-            <p>No posts yet. Be the first to create one!</p>
-          ) : (
-            posts.map((post) => (
+    <Content style={{ padding: '48px'}}>
+      <div className="feed-header">
+        <Typography.Title
+          level={2}
+          style={{
+            margin: 0,
+            color: 'var(--text-h)',
+            fontWeight: 600,
+            letterSpacing: '-1px',
+          }}
+        >
+          The Feed<span style={{ color: 'var(--accent)' }}>.</span>
+        </Typography.Title>
+        <Space>
+          <TiltMenu
+            appliedFilters={appliedFilters}
+            availableLabels={['optimism', 'nsfw']}
+            onApply={setAppliedFilters}
+          />
+          <Button icon={<ReloadOutlined />} onClick={() => fetchPosts(appliedFilters)}>
+            Refresh
+          </Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/write')}>
+            New Post
+          </Button>
+        </Space>
+      </div>
+      <Spin spinning={loading}>
+        {posts.length === 0 ? (
+          <p style={{ color: 'var(--text)' }}>No posts yet. Be the first to create one!</p>
+        ) : (
+          <div style={{ display: 'grid', gap: 24 }}>
+            {posts.map((post) => (
               <PostCard
                 key={post._id}
                 id={post._id}
@@ -80,11 +91,11 @@ const Body: React.FC = () => {
                 createdAt={post.createdAt.toString()}
                 sentiment={post.scores}
               />
-            ))
-          )}
-        </Spin>
-      </Content>
-    </Layout>
+            ))}
+          </div>
+        )}
+      </Spin>
+    </Content>
   );
 };
 
