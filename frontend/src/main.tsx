@@ -12,6 +12,7 @@ import { ForgotPassword } from './routes/ForgotPassword.tsx'
 import { ResetPassword } from './routes/ResetPassword.tsx'
 import Editor from './routes/Editor.tsx'
 import Feed from './routes/Feed.tsx'
+import Search from './routes/Search.tsx'
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string
 
@@ -28,6 +29,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/reset-password" element={<ResetPassword />}></Route>
           <Route path="/feed" element={<Feed />}></Route>
           <Route path="/write" element={<Editor />}></Route>
+          <Route path="/search" element={<Search />}></Route>
         </Routes>
       </BrowserRouter>
     </GoogleOAuthProvider>

@@ -3,7 +3,7 @@ import { Input, Card, Empty, Spin, Button, Layout } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
-import '../assets/Search.css';
+// import '../assets/Search.css';
 import Navbar from '../components/Navbar';
 
 const { Content } = Layout;
