@@ -47,7 +47,8 @@ export function LoginForm() {
             });
 
             if (response.status === 200) {
-                localStorage.setItem("token", "success");
+                const res_data = await response.json();
+                localStorage.setItem("token", res_data.token);
                 localStorage.setItem("username", body.username);
                 navigate("/feed");
                 return;
