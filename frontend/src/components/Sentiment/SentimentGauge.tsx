@@ -20,13 +20,14 @@ export const SentimentGauge: React.FC<SentimentGaugeProps> = ({ score, label = '
   };
 
   return (
-      <Space direction="vertical" style={{ width: '150px', paddingRight: '10px' }}>
+      <Space direction="vertical" style={{ width: '120px', color: 'white' }}>
         <Typography.Text>{label}</Typography.Text>
         <Progress
           type="circle"
           percent={percentage}
           strokeColor={getColor(percentage)}
           size={60}
+          railColor='#aaa'
           format={() => getSentimentLabel(score)}
           
         />
