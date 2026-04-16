@@ -126,7 +126,6 @@ export default function SinglePost() {
     );
   }
 
-  const isAuthor = currentUser === post.creator;
 
   return (
     <Layout style={{ background: 'var(--bg)', minHeight: '100dvh', overflowX: 'hidden' }}>
@@ -143,11 +142,10 @@ export default function SinglePost() {
             <h1 style={{ margin: 0, color: 'var(--text-h)', fontSize: 'clamp(32px, 4vw, 52px)', letterSpacing: '-1.2px', fontWeight: 500, lineHeight: 1.1 }}>
               {post.title}
             </h1>
-            {isAuthor && (
-              <Button danger icon={<DeleteOutlined />} onClick={confirmDeletePost}>
-                Delete
-              </Button>
-            )}
+            {/* show delete to everyone, backend enforces author check with 403 -dechante */}
+            <Button danger icon={<DeleteOutlined />} onClick={confirmDeletePost}>
+              Delete
+            </Button>
           </div>
 
           <p style={{ margin: '16px 0 32px', color: 'var(--text)', fontSize: 14 }}>

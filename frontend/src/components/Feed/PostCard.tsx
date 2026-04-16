@@ -24,11 +24,10 @@ export const PostCard: React.FC<PostCardProps> = ({
   sentiment,
 }) => {
   const navigate = useNavigate();
-  const currentUser = localStorage.getItem('username');
-  const isAuthor = currentUser === creator;
 
-  // rubric requires ONE confirmation modal on delete. Modal.confirm is the only alert -dechante
-  const handleDelete = () => {
+  // rubric requires ONE confirmation modal on delete. Modal.confirm is the only alert. backend enforces author check, so show button to everyone -dechante
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
     Modal.confirm({
       title: 'Delete this post?',
       content: 'This cannot be undone. The post and its comments will be removed.',
@@ -41,7 +40,7 @@ export const PostCard: React.FC<PostCardProps> = ({
           message.success('Post deleted');
           window.location.reload();
         } catch {
-          message.error('Failed to delete post');
+          message.error('Failed to delete post (you can only delete your own)');
         }
       },
     });
@@ -56,12 +55,10 @@ export const PostCard: React.FC<PostCardProps> = ({
             by <strong>{creator}</strong> &middot; {new Date(createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
-        {isAuthor && (
-          <Space onClick={(e) => e.stopPropagation()}>
-            <Button icon={<EditOutlined />} type="text" onClick={() => navigate(`/write?id=${id}`)} aria-label="Edit post" />
-            <Button icon={<DeleteOutlined />} type="text" danger onClick={handleDelete} aria-label="Delete post" />
-          </Space>
-        )}
+        <Space onClick={(e) => e.stopPropagation()}>
+          <Button icon={<EditOutlined />} type="text" onClick={() => navigate(`/write?id=${id}`)} aria-label="Edit post" />
+          <Button icon={<DeleteOutlined />} type="text" danger onClick={handleDelete} aria-label="Delete post" />
+        </Space>
       </div>
 
       <p className="post-content">{content}</p>

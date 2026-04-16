@@ -1,19 +1,20 @@
-import { StrictMode } from 'react'
+import { StrictMode, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { BrowserRouter, Route } from 'react-router'
-import { Routes } from 'react-router'
+import { BrowserRouter, Route, Routes } from 'react-router'
 import { GoogleOAuthProvider } from '@react-oauth/google'
-import { Login } from './routes/Login.tsx'
-import { Register } from './routes/Register.tsx'
 import { Index } from './routes/Index.tsx'
-import { VerifyEmail } from './routes/VerifyEmail.tsx'
-import { ForgotPassword } from './routes/ForgotPassword.tsx'
-import { ResetPassword } from './routes/ResetPassword.tsx'
-import Editor from './routes/Editor.tsx'
-import Feed from './routes/Feed.tsx'
-import Search from './routes/Search.tsx'
-import SinglePost from './routes/SinglePost.tsx'
+
+// route-split everything except landing so first paint only ships the hero + collage -dechante
+const Login = lazy(() => import('./routes/Login.tsx').then(m => ({ default: m.Login })))
+const Register = lazy(() => import('./routes/Register.tsx').then(m => ({ default: m.Register })))
+const VerifyEmail = lazy(() => import('./routes/VerifyEmail.tsx').then(m => ({ default: m.VerifyEmail })))
+const ForgotPassword = lazy(() => import('./routes/ForgotPassword.tsx').then(m => ({ default: m.ForgotPassword })))
+const ResetPassword = lazy(() => import('./routes/ResetPassword.tsx').then(m => ({ default: m.ResetPassword })))
+const Editor = lazy(() => import('./routes/Editor.tsx'))
+const Feed = lazy(() => import('./routes/Feed.tsx'))
+const Search = lazy(() => import('./routes/Search.tsx'))
+const SinglePost = lazy(() => import('./routes/SinglePost.tsx'))
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string
 
@@ -23,22 +24,32 @@ if (import.meta.env.DEV && !localStorage.getItem('token')) {
   localStorage.setItem('username', 'dev');
 }
 
+function RouteFallback() {
+  return (
+    <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', color: 'var(--text)' }}>
+      <span style={{ opacity: 0.7, fontSize: 14, letterSpacing: 1, textTransform: 'uppercase' }}>Loading</span>
+    </div>
+  )
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />}></Route>
-          <Route path="/login" element={<Login />}></Route>
-          <Route path="/register" element={<Register />}></Route>
-          <Route path="/verify-email" element={<VerifyEmail />}></Route>
-          <Route path="/forgot-password" element={<ForgotPassword />}></Route>
-          <Route path="/reset-password" element={<ResetPassword />}></Route>
-          <Route path="/feed" element={<Feed />}></Route>
-          <Route path="/write" element={<Editor />}></Route>
-          <Route path="/search" element={<Search />}></Route>
-          <Route path="/post/:id" element={<SinglePost />}></Route>
-        </Routes>
+        <Suspense fallback={<RouteFallback />}>
+          <Routes>
+            <Route path="/" element={<Index />}></Route>
+            <Route path="/login" element={<Login />}></Route>
+            <Route path="/register" element={<Register />}></Route>
+            <Route path="/verify-email" element={<VerifyEmail />}></Route>
+            <Route path="/forgot-password" element={<ForgotPassword />}></Route>
+            <Route path="/reset-password" element={<ResetPassword />}></Route>
+            <Route path="/feed" element={<Feed />}></Route>
+            <Route path="/write" element={<Editor />}></Route>
+            <Route path="/search" element={<Search />}></Route>
+            <Route path="/post/:id" element={<SinglePost />}></Route>
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </GoogleOAuthProvider>
   </StrictMode>,
