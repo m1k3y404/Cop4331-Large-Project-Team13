@@ -9,7 +9,7 @@ export default function Brand({ size = 22 }: { size?: number }) {
                 fontFamily: "var(--heading)",
             }}
         >
-            tilt<span style={{ color: "var(--accent)" }}>.</span>
+            tilt<span className="tilt-brand-dot">.</span>
         </span>
     );
 }

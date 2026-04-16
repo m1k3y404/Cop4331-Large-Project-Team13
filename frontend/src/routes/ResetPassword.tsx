@@ -1,9 +1,16 @@
-import { Alert, Button, Card, Form, Input, Layout, Space, Typography } from "antd";
+import { Alert, Button, Form, Input, Layout } from "antd";
 import { Content } from "antd/es/layout/layout";
 import { useCallback, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
+import { motion } from "framer-motion";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "";
+
+const spring = { type: "spring" as const, stiffness: 100, damping: 20 };
+const fadeUp = {
+    hidden: { opacity: 0, y: 16 },
+    show: (i: number = 0) => ({ opacity: 1, y: 0, transition: { ...spring, delay: 0.08 * i } }),
+};
 
 export function ResetPassword() {
     const navigate = useNavigate();
@@ -39,31 +46,39 @@ export function ResetPassword() {
     }, [token, navigate]);
 
     return (
-        <Layout style={{ minHeight: "100dvh", background: "var(--bg)" }}>
-            <Content style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
-                <Card style={{ width: "100%", maxWidth: 420 }} variant="outlined">
-                    <Space direction="vertical" size="large" style={{ width: "100%" }}>
-                        <div>
-                            <Typography.Title level={3} style={{ margin: 0 }}>Choose a new password</Typography.Title>
-                            <Typography.Text type="secondary">Use at least 6 characters.</Typography.Text>
-                        </div>
+        <Layout className="tilt-page">
+            <Content>
+                <div className="tilt-shell" style={{ maxWidth: 460, paddingTop: 80 }}>
+                    <motion.div initial="hidden" animate="show" variants={fadeUp} custom={0}>
+                        <span className="tilt-kicker">Reset password</span>
+                        <h1 className="tilt-hed">Choose a new one.</h1>
+                    </motion.div>
 
+                    <motion.div
+                        initial="hidden"
+                        animate="show"
+                        variants={fadeUp}
+                        custom={1}
+                        className="tilt-panel"
+                        style={{ marginTop: 32 }}
+                    >
                         {!token && (
                             <Alert
                                 type="warning"
                                 showIcon
                                 message="No token in link"
                                 description="This page needs a ?token=... from your reset email."
+                                style={{ marginBottom: 20 }}
                             />
                         )}
 
-                        <Form layout="vertical" onFinish={submit} requiredMark={false} disabled={submitting || !token}>
+                        <Form className="tilt-form" layout="vertical" onFinish={submit} requiredMark={false} disabled={submitting || !token}>
                             {error && <Alert type="error" message={error} showIcon style={{ marginBottom: 16 }} />}
                             <Form.Item label="New password" name="newPassword" rules={[
                                 { required: true, message: "Enter a new password" },
                                 { min: 6, message: "At least 6 characters" },
                             ]}>
-                                <Input.Password autoComplete="new-password" />
+                                <Input.Password autoComplete="new-password" size="large" />
                             </Form.Item>
                             <Form.Item label="Confirm password" name="confirm" dependencies={["newPassword"]} rules={[
                                 { required: true, message: "Confirm your password" },
@@ -74,20 +89,26 @@ export function ResetPassword() {
                                     },
                                 }),
                             ]}>
-                                <Input.Password autoComplete="new-password" />
+                                <Input.Password autoComplete="new-password" size="large" />
                             </Form.Item>
                             <Form.Item style={{ marginBottom: 0 }}>
-                                <Button type="primary" htmlType="submit" loading={submitting} block>
+                                <Button type="primary" htmlType="submit" loading={submitting} block size="large">
                                     Reset password
                                 </Button>
                             </Form.Item>
                         </Form>
+                    </motion.div>
 
-                        <Typography.Text type="secondary" style={{ textAlign: "center", display: "block" }}>
-                            <Link to="/login">Back to log in</Link>
-                        </Typography.Text>
-                    </Space>
-                </Card>
+                    <motion.p
+                        initial="hidden"
+                        animate="show"
+                        variants={fadeUp}
+                        custom={2}
+                        style={{ marginTop: 20, textAlign: "center", color: "var(--text)", fontSize: 14 }}
+                    >
+                        <Link to="/login" style={{ color: "var(--accent)" }}>Back to log in</Link>
+                    </motion.p>
+                </div>
             </Content>
         </Layout>
     );

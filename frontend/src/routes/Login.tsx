@@ -1,37 +1,58 @@
-import { Alert, Button, Card, Divider, Form, Input, Layout, Space, Typography } from "antd";
+import { Alert, Button, Divider, Form, Input, Layout, Space } from "antd";
 import { Content } from "antd/es/layout/layout";
 import { useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { GoogleLogin } from "@react-oauth/google";
+import { motion } from "framer-motion";
 import { saveAuth } from "../utils/auth";
 
-// relative URLs in prod, nginx proxies /api to backend. override VITE_API_BASE for local dev -dechante
 const API_BASE = import.meta.env.VITE_API_BASE ?? "";
+
+const spring = { type: "spring" as const, stiffness: 100, damping: 20 };
+const fadeUp = {
+    hidden: { opacity: 0, y: 16 },
+    show: (i: number = 0) => ({ opacity: 1, y: 0, transition: { ...spring, delay: 0.08 * i } }),
+};
 
 type AuthBody = { username: string; password: string };
 
 export function Login() {
     return (
-        <Layout style={{ minHeight: "100dvh", background: "var(--bg)" }}>
-            <Content style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "32px 16px" }}>
-                <Card style={{ width: "100%", maxWidth: 420 }} variant="outlined">
-                    <Space direction="vertical" size="large" style={{ width: "100%" }}>
-                        <div>
-                            <Typography.Title level={3} style={{ margin: 0 }}>Log in</Typography.Title>
-                            <Typography.Text type="secondary">Welcome back.</Typography.Text>
-                        </div>
+        <Layout className="tilt-page">
+            <Content>
+                <div className="tilt-shell" style={{ maxWidth: 460, paddingTop: 80 }}>
+                    <motion.div initial="hidden" animate="show" variants={fadeUp} custom={0}>
+                        <span className="tilt-kicker">Welcome back</span>
+                        <h1 className="tilt-hed">Log in to tilt.</h1>
+                    </motion.div>
+
+                    <motion.div
+                        initial="hidden"
+                        animate="show"
+                        variants={fadeUp}
+                        custom={1}
+                        className="tilt-panel"
+                        style={{ marginTop: 32 }}
+                    >
                         <LoginForm />
-                        <Typography.Text type="secondary" style={{ textAlign: "center", display: "block" }}>
-                            No account? <Link to="/register">Create one</Link>
-                        </Typography.Text>
-                    </Space>
-                </Card>
+                    </motion.div>
+
+                    <motion.p
+                        initial="hidden"
+                        animate="show"
+                        variants={fadeUp}
+                        custom={2}
+                        style={{ marginTop: 20, textAlign: "center", color: "var(--text)", fontSize: 14 }}
+                    >
+                        No account yet? <Link to="/register" style={{ color: "var(--accent)" }}>Create one</Link>
+                    </motion.p>
+                </div>
             </Content>
         </Layout>
     );
 }
 
-export function LoginForm() {
+function LoginForm() {
     const navigate = useNavigate();
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -53,12 +74,10 @@ export function LoginForm() {
                 navigate("/feed");
                 return;
             }
-
             if (response.status === 403) {
                 setError("Please verify your email before logging in.");
                 return;
             }
-
             const data = await response.json().catch(() => ({}));
             setError(data.error || "Incorrect username or password.");
             localStorage.removeItem("token");
@@ -94,22 +113,26 @@ export function LoginForm() {
     }, [navigate]);
 
     return (
-        <Form layout="vertical" onFinish={submit} requiredMark={false} disabled={submitting}>
+        <Form className="tilt-form" layout="vertical" onFinish={submit} requiredMark={false} disabled={submitting}>
             {error && <Alert type="error" message={error} showIcon style={{ marginBottom: 16 }} />}
             <Form.Item label="Username" name="username" rules={[{ required: true, message: "Enter your username" }]}>
-                <Input autoComplete="username" />
+                <Input autoComplete="username" size="large" />
             </Form.Item>
-            <Form.Item label="Password" name="password" rules={[{ required: true, message: "Enter your password" }]}
-                extra={<Link to="/forgot-password" style={{ fontSize: 12 }}>Forgot password?</Link>}>
-                <Input.Password autoComplete="current-password" />
+            <Form.Item
+                label="Password"
+                name="password"
+                rules={[{ required: true, message: "Enter your password" }]}
+                extra={<Link to="/forgot-password" style={{ fontSize: 12, color: "var(--text)" }}>Forgot password?</Link>}
+            >
+                <Input.Password autoComplete="current-password" size="large" />
             </Form.Item>
             <Form.Item style={{ marginBottom: 0 }}>
-                <Button type="primary" htmlType="submit" loading={submitting} block>
+                <Button type="primary" htmlType="submit" loading={submitting} block size="large">
                     Log in
                 </Button>
             </Form.Item>
-            <Divider plain style={{ margin: "24px 0 16px" }}>or</Divider>
-            <div style={{ display: "flex", justifyContent: "center" }}>
+            <Divider plain style={{ margin: "28px 0 20px", color: "var(--text)" }}>or</Divider>
+            <Space direction="vertical" style={{ width: "100%" }} align="center">
                 <GoogleLogin
                     onSuccess={(resp) => { if (resp.credential) submitGoogle(resp.credential); }}
                     onError={() => setError("Google sign-in failed.")}
@@ -117,7 +140,7 @@ export function LoginForm() {
                     size="large"
                     width="340"
                 />
-            </div>
+            </Space>
         </Form>
     );
 }

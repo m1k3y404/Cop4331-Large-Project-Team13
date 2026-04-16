@@ -1,16 +1,51 @@
 .feed-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--border);
+  align-items: flex-end;
+  margin: 0 0 32px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .feed-header h1 {
   margin: 0;
+  color: var(--text-h);
+  font-size: clamp(28px, 3.2vw, 44px);
+  letter-spacing: -1px;
+  font-weight: 500;
+  line-height: 1;
 }
 
-.feed-header .ant-typography {
-  margin: 0 !important;
+.feed-kicker {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+
+.feed-empty {
+  padding: 80px 24px;
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: 20px;
+  color: var(--text);
+}
+
+.feed-empty h3 {
+  margin: 16px 0 8px;
+  color: var(--text-h);
+  font-weight: 500;
+}
+
+.feed-skeleton-row {
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: 10px;
+}
+
+.feed-skeleton-row:last-child {
+  border-bottom: 1px solid var(--border);
 }

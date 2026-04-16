@@ -1,13 +1,32 @@
 .post-editor-container {
-  max-width: 900px;
+  max-width: 780px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 64px 32px 96px;
+}
+
+.post-editor-kicker {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+
+.post-editor-title {
+  margin: 0 0 32px;
+  color: var(--text-h);
+  font-size: clamp(32px, 4vw, 48px);
+  letter-spacing: -1px;
+  font-weight: 500;
+  line-height: 1.05;
 }
 
 .post-editor-card {
-  border-radius: 8px;
+  border-radius: 20px;
+  border-color: var(--border) !important;
 }
 
 .form-actions {
-  margin-top: 20px !important;
+  margin-top: 24px !important;
 }

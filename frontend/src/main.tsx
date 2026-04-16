@@ -13,8 +13,15 @@ import { ResetPassword } from './routes/ResetPassword.tsx'
 import Editor from './routes/Editor.tsx'
 import Feed from './routes/Feed.tsx'
 import Search from './routes/Search.tsx'
+import SinglePost from './routes/SinglePost.tsx'
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string
+
+// DEV bypass so auth-guarded pages are reachable on localhost without logging in. stripped in prod builds -dechante
+if (import.meta.env.DEV && !localStorage.getItem('token')) {
+  localStorage.setItem('token', 'dev-bypass-token');
+  localStorage.setItem('username', 'dev');
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -30,6 +37,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/feed" element={<Feed />}></Route>
           <Route path="/write" element={<Editor />}></Route>
           <Route path="/search" element={<Search />}></Route>
+          <Route path="/post/:id" element={<SinglePost />}></Route>
         </Routes>
       </BrowserRouter>
     </GoogleOAuthProvider>

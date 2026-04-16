@@ -86,3 +86,39 @@ export const postService = {
     if (!response.ok) throw new Error('Failed to delete post');
   }
 };
+
+export interface IComment {
+  _id: string;
+  postId: string;
+  creator: string;
+  content: string;
+  createdAt: string;
+}
+
+// comments service, wired to /api/comments -dechante
+export const commentService = {
+  async list(postId: string): Promise<IComment[]> {
+    const response = await fetch(`${API_BASE_URL}/comments/${postId}`);
+    if (!response.ok) throw new Error('Failed to load comments');
+    return response.json();
+  },
+
+  async add(postId: string, content: string): Promise<IComment> {
+    const creator = tokenService.getUsername();
+    const response = await fetch(`${API_BASE_URL}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', "Authorization": "Bearer " + tokenService.getToken() },
+      body: JSON.stringify({ postId, creator, content }),
+    });
+    if (!response.ok) throw new Error('Failed to add comment');
+    return response.json();
+  },
+
+  async remove(id: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/comments/${id}`, {
+      method: 'DELETE',
+      headers: { "Authorization": "Bearer " + tokenService.getToken() },
+    });
+    if (!response.ok) throw new Error('Failed to delete comment');
+  },
+};

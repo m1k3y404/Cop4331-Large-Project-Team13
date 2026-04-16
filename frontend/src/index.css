@@ -109,3 +109,114 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* tactile feedback on any pressed button, cheap UX win per taste rule 5 -dechante */
+button:not(:disabled):active,
+.ant-btn:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+/* shared page shell classes used by auth + inside pages to match landing palette -dechante */
+.tilt-page {
+  background: var(--bg);
+  min-height: 100dvh;
+  color: var(--text);
+}
+.tilt-shell {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 48px 32px 80px;
+  text-align: left;
+}
+.tilt-kicker {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+.tilt-hed {
+  margin: 0;
+  color: var(--text-h);
+  font-weight: 500;
+  letter-spacing: -1px;
+  line-height: 1.05;
+  font-size: clamp(32px, 4vw, 52px);
+}
+.tilt-panel {
+  background: color-mix(in srgb, var(--code-bg) 50%, var(--bg));
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 36px;
+  box-shadow: var(--shadow);
+}
+.tilt-panel--muted {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* style AntD primitives to match tilt palette -dechante */
+.tilt-form .ant-form-item-label > label {
+  color: var(--text) !important;
+  font-size: 13px !important;
+}
+.tilt-form .ant-input,
+.tilt-form .ant-input-affix-wrapper,
+.tilt-form .ant-input-password {
+  background: var(--bg) !important;
+  border-color: var(--border) !important;
+  color: var(--text-h) !important;
+}
+.tilt-form .ant-input::placeholder {
+  color: color-mix(in srgb, var(--text) 70%, transparent) !important;
+}
+.tilt-form .ant-input:focus,
+.tilt-form .ant-input-affix-wrapper-focused,
+.tilt-form .ant-input-password:focus-within {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-bg) !important;
+}
+
+/* mobile collapse for pages with action rows -dechante */
+@media (max-width: 640px) {
+  .tilt-shell { padding: 32px 20px 64px; }
+  .tilt-panel { padding: 28px 20px; border-radius: 16px; }
+}
+@media (max-width: 820px) {
+  .tilt-editor-shell {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+    padding: 40px 20px 80px !important;
+  }
+  .tilt-editor-shell aside {
+    position: static !important;
+  }
+}
+
+/* tilt. brand dot — perpetual soft pulse to make the nav feel alive (MOTION 6) -dechante */
+.tilt-brand-dot {
+  display: inline-block;
+  color: var(--accent);
+  animation: tiltPulse 2.6s ease-in-out infinite;
+}
+@keyframes tiltPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* blinking cursor for search typewriter -dechante */
+.tilt-cursor {
+  display: inline-block;
+  margin-left: 1px;
+  animation: tiltCursor 1s steps(1) infinite;
+  color: var(--accent);
+}
+@keyframes tiltCursor {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tilt-brand-dot, .tilt-cursor { animation: none; }
+}

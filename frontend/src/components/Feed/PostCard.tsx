@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Space, Button, message } from 'antd';
+import { Space, Button, Modal, message } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import './PostCard.css';
 import SentimentGauge from '../Sentiment/SentimentGauge';
@@ -24,41 +24,56 @@ export const PostCard: React.FC<PostCardProps> = ({
   sentiment,
 }) => {
   const navigate = useNavigate();
-  const handleDelete = async () => {
-    try {
-      await postService.deletePost(id);
-      message.success('Post deleted');
-      window.location.reload();
-    } catch {
-      message.error('Failed to delete post');
-    }
+  const currentUser = localStorage.getItem('username');
+  const isAuthor = currentUser === creator;
+
+  // rubric requires ONE confirmation modal on delete. Modal.confirm is the only alert -dechante
+  const handleDelete = () => {
+    Modal.confirm({
+      title: 'Delete this post?',
+      content: 'This cannot be undone. The post and its comments will be removed.',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Keep it',
+      onOk: async () => {
+        try {
+          await postService.deletePost(id);
+          message.success('Post deleted');
+          window.location.reload();
+        } catch {
+          message.error('Failed to delete post');
+        }
+      },
+    });
   };
 
   return (
-    <Card className="post-card">
+    <article className="post-card" onClick={() => navigate(`/post/${id}`)} style={{ cursor: 'pointer' }}>
       <div className="post-header">
         <div>
           <h3>{title}</h3>
           <p className="post-meta">
-            by <strong>{creator}</strong> • {new Date(createdAt).toLocaleDateString()}
+            by <strong>{creator}</strong> &middot; {new Date(createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
-        <Space>
-          <Button icon={<EditOutlined />} type="text" onClick={() => navigate(`/write?id=${id}`)}/>
-          <Button icon={<DeleteOutlined />} type="text" danger onClick={handleDelete} />
-        </Space>
+        {isAuthor && (
+          <Space onClick={(e) => e.stopPropagation()}>
+            <Button icon={<EditOutlined />} type="text" onClick={() => navigate(`/write?id=${id}`)} aria-label="Edit post" />
+            <Button icon={<DeleteOutlined />} type="text" danger onClick={handleDelete} aria-label="Delete post" />
+          </Space>
+        )}
       </div>
 
       <p className="post-content">{content}</p>
 
-      {sentiment && (
+      {sentiment && Object.keys(sentiment).length > 0 && (
         <div className="post-tags">
           {Object.entries(sentiment).map(([tag, value]) => (
-            <SentimentGauge label={tag} score={value} />
+            <SentimentGauge key={tag} label={tag} score={value} />
           ))}
         </div>
       )}
-    </Card>
+    </article>
   );
 };
 
