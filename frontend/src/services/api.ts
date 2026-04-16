@@ -23,13 +23,23 @@ export const tokenService = {
 }
 
 export const postService = {
-  async createPost(title: string, content: string, creator: string): Promise<IPost> {
+  async createPost(title: string, content: string): Promise<IPost> {
     const response = await fetch(`${API_BASE_URL}/posts`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', "Authorization": "Bearer " + tokenService.getToken() },
-      body: JSON.stringify({ title, content, creator }),
+      body: JSON.stringify({ title, content }),
     });
     if (!response.ok) throw new Error('Failed to create post');
+    return await response.json() as IPost;
+  },
+
+  async updatePost(id: string, title: string, content: string): Promise<IPost> {
+    const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', "Authorization": "Bearer " + tokenService.getToken() },
+      body: JSON.stringify({ title, content }),
+    });
+    if (!response.ok) throw new Error('Failed to update post');
     return await response.json() as IPost;
   },
 

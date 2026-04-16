@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Form, Input, Button, Card, Space, message, Spin } from 'antd';
 import { SaveOutlined, ClearOutlined, HomeOutlined } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router';
@@ -31,12 +31,18 @@ export const PostEditor: React.FC<PostEditorProps> = ({ onSuccess }) => {
     })()
   }, [form, id])
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = useCallback(async (values: any) => {
     try {
       setLoading(true);
-      const creator = localStorage.getItem('username') || 'anonymous';
 
-      const post = await postService.createPost(values.title, values.content, creator);
+      let post;
+
+      if(!id) {
+        post = await postService.createPost(values.title, values.content);
+      } else {
+        post = await postService.updatePost(id, values.title, values.content);
+      }
+
 
       /*
       if (post.sentimentScore !== undefined) {
@@ -52,14 +58,14 @@ export const PostEditor: React.FC<PostEditorProps> = ({ onSuccess }) => {
       }
 
       setTimeout(() => {
-        navigate('/');
+        navigate('/feed');
       }, 2000);
     } catch (error: any) {
       message.error(error.response?.data?.error || 'Failed to create post');
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate, form, onSuccess, id]);
 
   const handleReset = () => {
     form.resetFields();
