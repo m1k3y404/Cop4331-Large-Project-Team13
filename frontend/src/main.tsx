@@ -35,7 +35,7 @@ function RouteFallback() {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-      <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}></ConfigProvider>
+      <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <BrowserRouter>
         <Suspense fallback={<RouteFallback />}>
@@ -54,5 +54,6 @@ createRoot(document.getElementById('root')!).render(
         </Suspense>
       </BrowserRouter>
     </GoogleOAuthProvider>
+    </ConfigProvider>
   </StrictMode>,
 )
