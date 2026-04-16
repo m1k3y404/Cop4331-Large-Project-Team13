@@ -58,7 +58,7 @@ const Body: React.FC = () => {
         <Space wrap>
           <TiltMenu
             appliedFilters={appliedFilters}
-            availableLabels={['optimism', 'nsfw']}
+            availableLabels={['optimism', 'nsfw','controversial']}
             onApply={setAppliedFilters}
           />
           <Button icon={<ReloadOutlined />} onClick={() => fetchPosts(appliedFilters)}>
