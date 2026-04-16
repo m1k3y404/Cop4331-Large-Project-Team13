@@ -1,5 +1,5 @@
 import React from 'react';
-import { Progress, Space, Typography } from 'antd';
+import { Progress, Card, Space, Typography } from 'antd';
 import './SentimentGauge.css';
 
 interface SentimentGaugeProps {
@@ -20,18 +20,18 @@ export const SentimentGauge: React.FC<SentimentGaugeProps> = ({ score, label = '
   };
 
   return (
-      <Space direction="vertical" style={{ width: '120px', color: 'white' }}>
+    <Card className="sentiment-gauge-card">
+      <Space direction="vertical" style={{ width: '100%' }}>
         <Typography.Text>{label}</Typography.Text>
         <Progress
           type="circle"
           percent={percentage}
           strokeColor={getColor(percentage)}
-          size={60}
-          railColor='#aaa'
+          size={80}
           format={() => getSentimentLabel(score)}
-          
         />
       </Space>
+    </Card>
   );
 };
 
