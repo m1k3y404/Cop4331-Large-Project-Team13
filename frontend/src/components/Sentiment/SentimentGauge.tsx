@@ -8,7 +8,7 @@ interface SentimentGaugeProps {
 }
 
 export const SentimentGauge: React.FC<SentimentGaugeProps> = ({ score, label = 'Sentiment' }) => {
-  const percentage = ((score + 1) / 2) * 100;
+  const percentage = score * 100;
   const getColor = (value: number) => {
     if (value < 33) return '#ff4d4f';
     if (value < 66) return '#faad14';
@@ -16,9 +16,7 @@ export const SentimentGauge: React.FC<SentimentGaugeProps> = ({ score, label = '
   };
 
   const getSentimentLabel = (value: number) => {
-    if (value < -0.5) return 'Negative';
-    if (value < 0.5) return 'Neutral';
-    return 'Positive';
+    return Math.round(value*5).toString()
   };
 
   return (
@@ -27,8 +25,9 @@ export const SentimentGauge: React.FC<SentimentGaugeProps> = ({ score, label = '
         <Typography.Text>{label}</Typography.Text>
         <Progress
           type="circle"
-          percent={Math.round(percentage)}
+          percent={percentage}
           strokeColor={getColor(percentage)}
+          size={80}
           format={() => getSentimentLabel(score)}
         />
       </Space>
