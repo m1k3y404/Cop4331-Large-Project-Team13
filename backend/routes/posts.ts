@@ -111,10 +111,17 @@ router.get('/search', async (req: Request, res: Response) => {
     }
     const escaped = escapeRegex(q);
     const regex = new RegExp(escaped, 'i');
-    const posts = await Post.find({
-      $or: [{ title: regex }, { content: regex }, { tags: regex }]
-    }).sort({ createdAt: -1 });
-    res.status(200).json(posts);
+    const page = parseInt(req.query['page'] as string) || 1;
+    const limit = Math.min(parseInt(req.query['limit'] as string) || 20, 100);
+    const skip = (page - 1) * limit;
+    const [posts, total] = await Promise.all([
+      Post.find({
+        $or: [{ title: regex }, { content: regex }, { creator: regex }]
+      }).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Post.countDocuments()
+    ]);
+    const result = await attachCommentCounts(posts);
+    res.status(200).json({ posts: result, total, page, limit });
   } catch (err) {
     res.status(500).json({ error: 'something went wrong' });
   }

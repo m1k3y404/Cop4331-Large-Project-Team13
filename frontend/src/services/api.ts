@@ -39,6 +39,12 @@ export const postService = {
     return response.json();
   },
 
+  async searchPosts(q: string, page = 1, limit = 20): Promise<PostsResult> {
+    const response = await fetch(`${API_BASE_URL}/posts?page=${page}&limit=${limit}&q=${q}`);
+    if (!response.ok) throw new Error('Failed to fetch posts');
+    return response.json();
+  },
+
   async getPost(id: string): Promise<IPost> {
     const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
       method: 'GET',

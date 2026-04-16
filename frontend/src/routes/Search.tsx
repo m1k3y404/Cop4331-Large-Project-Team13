@@ -5,22 +5,15 @@ import { useNavigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
 // import '../assets/Search.css';
 import Navbar from '../components/Navbar';
+import { postService, type IPost } from '../services/api';
 
 const { Content } = Layout;
-
-interface Post {
-  _id: string;
-  title: string;
-  content: string;
-  creator: string;
-  createdAt: string;
-}
 
 export default function Search() {
   useAuth(); // Guard page
   
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<Post[]>([]);
+  const [results, setResults] = useState<IPost[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const navigate = useNavigate();
@@ -38,10 +31,8 @@ export default function Search() {
     setSearched(true);
 
     try {
-      // Call your actual API here
-      // const response = await fetch(`/api/posts/search?q=${value}`);
-      // const data = await response.json();
-      // setResults(data);
+      const response = await postService.searchPosts(value);
+      setResults(response.posts);
     } catch (error) {
       console.error('Search failed:', error);
     } finally {

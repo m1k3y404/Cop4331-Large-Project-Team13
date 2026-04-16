@@ -14,12 +14,12 @@ export const analyzePostInBackground = async (postId: string, content: string) =
         }),
       }),
       system: `Score the blog post sentiment and safety. Respond only in JSON.
-        - 0.1: Extremely Nihilistic. Focuses on total despair, inevitable failure, or the pointlessness of existence.
+        - 0.1: Extremely Nihilistic. Focuses on total despair, inevitable failure, or the pointlessness of existence. Glass half empty.
         - 0.2 - 0.3: Negative/Cynical. Focuses on problems, complaints, or a "doomer" outlook without any suggested solutions.
         - 0.4 - 0.5: Neutral/Objective. Reporting facts or events without an emotional lean, or a perfect balance of pros and cons.
         - 0.6 - 0.7: Positive/Hopeful. Generally upbeat, focuses on progress, small wins, or a constructive outlook.
         - 0.8 - 0.9: Highly Optimistic. Enthusiastic, motivational, and focuses on bright futures and massive opportunities.
-        - 1.0: Peak Inspiration. Overwhelmingly positive, visionary, and empowering content.
+        - 1.0: Peak Inspiration. Overwhelmingly positive, visionary, and empowering content. Glass half full.
 
         For NSFW:
         - 0.1: G-Rated / Family Friendly. Purely professional, educational, or wholesome content. No profanity or suggestive themes.
