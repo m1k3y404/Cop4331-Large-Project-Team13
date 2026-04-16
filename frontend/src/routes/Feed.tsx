@@ -5,10 +5,22 @@ import { useNavigate } from 'react-router';
 import PostCard from '../components/Feed/PostCard';
 import { postService, type IPost } from '../services/api';
 import '../assets/Feed.css';
+import Nav from '../components/Layout/Nav';
 
 const { Content } = Layout;
 
-export const Feed: React.FC = () => {
+export function Feed() {
+    return (
+        <Layout style={{ background: "var(--bg)", minHeight: "100dvh", overflowX: "hidden" }}>
+            <Content>
+                <Nav />
+                <Body />
+            </Content>
+        </Layout>
+    );
+}
+
+const Body: React.FC = () => {
   const [posts, setPosts] = useState<IPost[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();

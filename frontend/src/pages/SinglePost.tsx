@@ -29,8 +29,12 @@ export default function SinglePost() {
   
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  /*
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
+  */
+   const [post,] = useState<Post | null>(null);
+  const [comments,] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -104,6 +108,7 @@ export default function SinglePost() {
       okType: 'danger',
       onOk: async () => {
         try {
+          console.log(commentId)
           // Call your actual API here
           // await fetch(`/api/comments/${commentId}`, { method: 'DELETE' });
           

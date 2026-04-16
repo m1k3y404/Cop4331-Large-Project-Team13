@@ -4,6 +4,8 @@ import { ArrowRightOutlined, EditOutlined, MessageOutlined, SafetyOutlined } fro
 import { Link } from "react-router";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
+import Nav from "../components/Layout/Nav";
+import Brand from "../components/Layout/Brand";
 
 const spring = { type: "spring" as const, stiffness: 100, damping: 20 };
 
@@ -24,51 +26,6 @@ export function Index() {
                 <Footer />
             </Content>
         </Layout>
-    );
-}
-
-function Nav() {
-    return (
-        <nav
-            style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "20px 48px",
-                borderBottom: "1px solid var(--border)",
-                position: "sticky",
-                top: 0,
-                background: "color-mix(in srgb, var(--bg) 85%, transparent)",
-                backdropFilter: "blur(12px)",
-                zIndex: 10,
-            }}
-        >
-            <Brand size={22} />
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <Link to="/login" style={{ color: "var(--text)", fontSize: 14, padding: "6px 12px" }}>
-                    Log in
-                </Link>
-                <Link to="/register">
-                    <Button type="primary" size="middle">Get started</Button>
-                </Link>
-            </div>
-        </nav>
-    );
-}
-
-function Brand({ size = 22 }: { size?: number }) {
-    return (
-        <span
-            style={{
-                fontSize: size,
-                fontWeight: 600,
-                letterSpacing: "-0.5px",
-                color: "var(--text-h)",
-                fontFamily: "var(--heading)",
-            }}
-        >
-            tilt<span style={{ color: "var(--accent)" }}>.</span>
-        </span>
     );
 }
 

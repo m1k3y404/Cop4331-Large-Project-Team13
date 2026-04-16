@@ -1,4 +1,4 @@
-import { Layout, Menu, Button, Dropdown, Space, Avatar } from 'antd';
+import { Layout, Menu, Button, Dropdown } from 'antd';
 import { useNavigate } from 'react-router';
 import { LogoutOutlined, HomeOutlined, SearchOutlined, FileTextOutlined } from '@ant-design/icons';
 import '../assets/Navbar.css';
@@ -16,6 +16,7 @@ export default function Navbar() {
     navigate('/login');
   };
 
+  /*
   const userMenu = (
     <Menu>
       <Menu.Item key="user" disabled>
@@ -27,6 +28,7 @@ export default function Navbar() {
       </Menu.Item>
     </Menu>
   );
+  */
 
   return (
     <Header

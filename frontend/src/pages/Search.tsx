@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Input, Card, Empty, Spin, Button, Space, Layout } from 'antd';
+import { Input, Card, Empty, Spin, Button, Layout } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth';
