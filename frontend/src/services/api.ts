@@ -5,7 +5,7 @@ export interface IPost {
   title: string;
   content: string;
   creator: string;
-  scores: Map<string, number>;
+  scores: Record<string, number>;
   isAnalyzed: boolean;
   createdAt: Date;
   updatedAt: Date;

@@ -12,7 +12,7 @@ interface PostCardProps {
   content: string;
   creator: string;
   createdAt: string;
-  sentiment?: Map<string, number>;
+  sentiment?: Record<string, number>;
 }
 
 export const PostCard: React.FC<PostCardProps> = ({
@@ -51,9 +51,9 @@ export const PostCard: React.FC<PostCardProps> = ({
 
       <p className="post-content">{content}</p>
 
-      {sentiment && sentiment.size > 0 && (
+      {sentiment && (
         <div className="post-tags">
-          {Array.from(sentiment.entries()).map(([tag, value]) => (
+          {Object.entries(sentiment).map(([tag, value]) => (
             <SentimentGauge label={tag} score={value} />
           ))}
         </div>
