@@ -4,7 +4,7 @@ interface IPost {
   title: string;
   content: string;
   creator: string;
-  scores: Record<string, number>;
+  scores: Map<string, number>;
   isAnalyzed: boolean;
   createdAt: Date;
   updatedAt: Date;

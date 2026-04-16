@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Space, Button, message } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import './PostCard.css';
+import SentimentGauge from '../Sentiment/SentimentGauge';
 
 interface PostCardProps {
   id: string;
@@ -9,8 +10,7 @@ interface PostCardProps {
   content: string;
   creator: string;
   createdAt: string;
-  tags?: string[];
-  sentiment?: number;
+  sentiment?: Map<string, number>;
 }
 
 export const PostCard: React.FC<PostCardProps> = ({
@@ -19,8 +19,7 @@ export const PostCard: React.FC<PostCardProps> = ({
   content,
   creator,
   createdAt,
-  tags = [],
-  //sentiment,
+  sentiment,
 }) => {
   const handleDelete = async () => {
     try {
@@ -31,7 +30,7 @@ export const PostCard: React.FC<PostCardProps> = ({
         message.success('Post deleted');
         window.location.reload();
       }
-    } catch (error) {
+    } catch {
       message.error('Failed to delete post');
     }
   };
@@ -53,12 +52,10 @@ export const PostCard: React.FC<PostCardProps> = ({
 
       <p className="post-content">{content}</p>
 
-      {tags.length > 0 && (
+      {sentiment && sentiment.size > 0 && (
         <div className="post-tags">
-          {tags.map((tag) => (
-            <span key={tag} className="tag">
-              {tag}
-            </span>
+          {Array.from(sentiment.entries()).map(([tag, value]) => (
+            <SentimentGauge label={tag} score={value} />
           ))}
         </div>
       )}
