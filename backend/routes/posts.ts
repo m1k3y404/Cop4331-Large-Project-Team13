@@ -55,7 +55,7 @@ router.post('/', async (req: Request, res: Response) => {
       return;
     }
     const newPost = await Post.create({ title, content, creator, scores: {}, isAnalyzed: false });
-    analyzePostInBackground(newPost._id.toString(), content);
+    analyzePostInBackground(newPost._id.toString(), title + '/n' + content);
     res.status(201).json(newPost);
   } catch (err) {
     res.status(500).json({ error: 'something went wrong' });

@@ -34,9 +34,9 @@ const addScores = async (postId: string, content: string): Promise<void> => {
         For Controversial:
         - 0.1: Uncontroversial. Widely accepted facts, universally agreed-upon opinions, or non-polarizing content.
         - 0.2 - 0.3: Slightly Controversial. Contains some debateable points or minority opinions.
-        - 0.4 - 0.5: Moderately Controversial. Presents conflicting viewpoints or touches on sensitive topics.
-        - 0.6 - 0.7: Quite Controversial. Deliberately provocative or polarizing content.
-        - 0.8 - 0.9: Highly Controversial. Extremely divisive or offensive content.
+        - 0.4 - 0.5: In most rooms there would be people who disagree
+        - 0.6 - 0.7: Quite Controversial. People feel strongly about the topic.
+        - 0.8 - 0.9: Highly Controversial. Deliberately provocative or polarizing content.
         - 1.0: Peak Controversy. Content that is likely to cause significant backlash or outrage.
 
         ### RULES:
@@ -62,9 +62,6 @@ const addScores = async (postId: string, content: string): Promise<void> => {
   } catch (error) {
     console.error(`Background scoring failed for ${postId}:`, error);
   }
-}
-const addControversialScore = async (postId: string, content: string): Promise<void> => {
-
 }
 
 export const analyzePostInBackground = async (postId: string, content: string) => {
