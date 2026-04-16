@@ -114,11 +114,12 @@ router.get('/search', async (req: Request, res: Response) => {
     const page = parseInt(req.query['page'] as string) || 1;
     const limit = Math.min(parseInt(req.query['limit'] as string) || 20, 100);
     const skip = (page - 1) * limit;
+    const filter = {
+      $or: [{ title: regex }, { content: regex }, { creator: regex }]
+    };
     const [posts, total] = await Promise.all([
-      Post.find({
-        $or: [{ title: regex }, { content: regex }, { creator: regex }]
-      }).sort({ createdAt: -1 }).skip(skip).limit(limit),
-      Post.countDocuments()
+      Post.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Post.countDocuments(filter)
     ]);
     const result = await attachCommentCounts(posts);
     res.status(200).json({ posts: result, total, page, limit });
