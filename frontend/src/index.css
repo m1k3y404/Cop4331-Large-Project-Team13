@@ -199,6 +199,17 @@ button:not(:disabled):active,
 .ant-modal-mask {
   background: rgba(0, 0, 0, 0.65) !important;
 }
+/* delete confirmation buttons vtgit */
+.ant-modal-confirm .ant-btn {
+  background: transparent !important;
+  border-color: #2e303a !important;
+  color: #f3f4f6 !important;
+}
+.ant-modal-confirm .ant-btn-dangerous {
+  background: transparent !important;
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+}
 
 /* style AntD primitives to match tilt palette -dechante */
 .tilt-form .ant-form-item-label > label {
