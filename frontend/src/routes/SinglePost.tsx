@@ -148,12 +148,12 @@ export default function SinglePost() {
             </Button>
           </div>
 
-          <p style={{ margin: '16px 0 32px', color: 'var(--text)', fontSize: 14 }}>
+          <p style={{ margin: '16px 0 32px', color: 'var(--text)', fontSize: 14, textAlign: 'left' }}>
             by <strong style={{ color: 'var(--text-h)', fontWeight: 500 }}>{post.creator}</strong> &middot;{' '}
             {new Date(post.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
           </p>
 
-          <div style={{ color: 'var(--text-h)', fontSize: 18, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+          <div style={{ color: 'var(--text-h)', fontSize: 18, lineHeight: 1.7, whiteSpace: 'pre-wrap', textAlign: 'left' }}>
             {post.content}
           </div>
 
@@ -172,7 +172,7 @@ export default function SinglePost() {
             {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
           </h2>
 
-          <div style={{ display: 'grid', gap: 12, marginBottom: 40 }}>
+          <div style={{ display: 'grid', gap: 24, marginBottom: 40 }}>
             <Input.TextArea
               placeholder="Reply with your take..."
               value={newComment}
@@ -181,7 +181,7 @@ export default function SinglePost() {
               maxLength={1000}
               showCount
             />
-            <Space style={{ justifyContent: 'flex-end', display: 'flex' }}>
+            <Space style={{ justifyContent: 'flex-end', display: 'flex', marginTop: 8 }}>
               <Button type="primary" onClick={handleAddComment} loading={submitting} disabled={!newComment.trim()}>
                 Post comment
               </Button>
@@ -209,7 +209,7 @@ export default function SinglePost() {
                       )}
                     </div>
                   </div>
-                  <p style={{ margin: 0, color: 'var(--text-h)', fontSize: 15, lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>
+                  <p style={{ margin: 0, color: 'var(--text-h)', fontSize: 15, lineHeight: 1.55, whiteSpace: 'pre-wrap', textAlign: 'left' }}>
                     {c.content}
                   </p>
                 </div>
