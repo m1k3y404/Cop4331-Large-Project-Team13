@@ -177,7 +177,7 @@ button:not(:disabled):active,
 /* modal confirm: portals outside ConfigProvider so darkAlgorithm doesnt reach them. force dark manually -dechante */
 .ant-modal .ant-modal-content {
   background: var(--code-bg) !important;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border) !important; /*added*/
   color: var(--text-h) !important;
 }
 .ant-modal .ant-modal-header {
@@ -201,6 +201,11 @@ button:not(:disabled):active,
 }
 .ant-modal .ant-btn-default:hover {
   border-color: var(--accent) !important;
+}
+.ant-modal-confirm .ant-btn-default {
+  background: transparent !important;
+  border-color: var(--border) !important;
+  color: var(--text-h) !important;
 }
 .ant-modal-mask {
   background: rgba(0, 0, 0, 0.65) !important;
