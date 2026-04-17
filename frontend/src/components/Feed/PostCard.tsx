@@ -1,5 +1,5 @@
 import React from 'react';
-import { Space, Button, Modal, App, message } from 'antd'; //added App
+import { Space, Button, Modal, message } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import './PostCard.css';
 import SentimentGauge from '../Sentiment/SentimentGauge';
@@ -24,14 +24,13 @@ export const PostCard: React.FC<PostCardProps> = ({
   sentiment,
 }) => {
   const navigate = useNavigate();
-  const { modal } = App.useApp(); //added this
   const currentUser = localStorage.getItem('username');
   const isAuthor = currentUser === creator;
 
   // rubric requires ONE confirmation modal on delete. Modal.confirm is the only alert -dechante
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    modal.confirm({ //changed from Modal.confirm
+    Modal.confirm({ 
       title: 'Delete this post?',
       content: 'This cannot be undone. The post and its comments will be removed.',
       okText: 'Delete',
