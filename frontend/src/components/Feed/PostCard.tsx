@@ -35,7 +35,7 @@ export const PostCard: React.FC<PostCardProps> = ({
       content: 'This cannot be undone. The post and its comments will be removed.',
       okText: 'Delete',
       okType: 'danger',
-      cancelText: 'Keep it',
+      cancelText: 'Cancel',
       onOk: async () => {
         try {
           await postService.deletePost(id);
