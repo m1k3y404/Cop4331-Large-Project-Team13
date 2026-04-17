@@ -200,6 +200,9 @@ button:not(:disabled):active,
   background: rgba(0, 0, 0, 0.65) !important;
 }
 /* delete confirmation buttons vtgit */
+.ant-modal-confirm .ant-modal-content {
+  background: #1f2028 !important;
+}
 .ant-modal-confirm .ant-btn {
   background: transparent !important;
   border-color: #2e303a !important;
