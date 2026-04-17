@@ -83,9 +83,10 @@ export default function SinglePost() {
   const confirmDeleteComment = (commentId: string) => {
     Modal.confirm({
       title: 'Delete this comment?',
+      content: 'This cannot be undone. The comment will be removed.',
       okText: 'Delete',
       okType: 'danger',
-      cancelText: 'Keep it',
+      cancelText: 'Cancel',
       onOk: async () => {
         try {
           await commentService.remove(commentId);
@@ -203,9 +204,7 @@ export default function SinglePost() {
                         {new Date(c.createdAt).toLocaleDateString()}
                       </span>
                       {currentUser === c.creator && (
-                        <Button type="text" size="small" danger onClick={() => confirmDeleteComment(c._id)}>
-                          Delete
-                        </Button>
+                        <Button type="text" size="small" danger icon={<DeleteOutlined />} onClick={() => confirmDeleteComment(c._id)} />
                       )}
                     </div>
                   </div>
