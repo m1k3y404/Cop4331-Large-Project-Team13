@@ -105,7 +105,7 @@ export default function SinglePost() {
       <Layout style={{ background: 'var(--bg)', minHeight: '100dvh' }}>
         <Content>
           <Navbar />
-          <div style={{ maxWidth: 760, margin: '0 auto', padding: '48px 32px' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 32px' }}>
             <Skeleton active title paragraph={{ rows: 6 }} />
           </div>
         </Content>
@@ -118,7 +118,7 @@ export default function SinglePost() {
       <Layout style={{ background: 'var(--bg)', minHeight: '100dvh' }}>
         <Content>
           <Navbar />
-          <div style={{ maxWidth: 760, margin: '0 auto', padding: '64px 32px', textAlign: 'center' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto', padding: '64px 32px', textAlign: 'center' }}>
             <h2 style={{ color: 'var(--text-h)' }}>Post not found</h2>
             <Button type="primary" onClick={() => navigate('/feed')}>Back to feed</Button>
           </div>
@@ -133,7 +133,7 @@ export default function SinglePost() {
       <Content>
         <Navbar />
 
-        <article style={{ maxWidth: 760, margin: '0 auto', padding: '48px 32px 16px' }}>
+        <article style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 32px 16px' }}>
           <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => navigate('/feed')} style={{ color: 'var(--text)', paddingLeft: 0, marginBottom: 24 }}>
             Back to feed
           </Button>
@@ -167,7 +167,7 @@ export default function SinglePost() {
           )}
         </article>
 
-        <section style={{ maxWidth: 760, margin: '0 auto', padding: '48px 32px 96px', borderTop: '1px solid var(--border)' }}>
+        <section style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 32px 96px', borderTop: '1px solid var(--border)' }}>
           <span style={kicker}>Discussion</span>
           <h2 style={{ margin: '0 0 24px', color: 'var(--text-h)', fontSize: 24, fontWeight: 500 }}>
             {comments.length} {comments.length === 1 ? 'comment' : 'comments'}

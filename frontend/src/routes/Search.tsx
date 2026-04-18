@@ -46,7 +46,7 @@ export default function Search() {
         <div className="tilt-shell">
           <span className="tilt-kicker">Search</span>
           <h1 className="tilt-hed" style={{ marginBottom: 28 }}>
-            Find what's been written.
+            Find what's been written<span style={{ color: 'var(--accent)' }}>.</span>
           </h1>
 
           <SearchBar value={query} onChange={setQuery} onSubmit={runSearch} />

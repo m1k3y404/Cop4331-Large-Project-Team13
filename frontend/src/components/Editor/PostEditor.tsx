@@ -74,7 +74,7 @@ export const PostEditor: React.FC<PostEditorProps> = ({ onSuccess }) => {
       >
         <span className="tilt-kicker">{editing ? 'Editing' : 'New post'}</span>
         <h1 className="tilt-hed" style={{ marginBottom: 20 }}>
-          {editing ? 'Rewrite it.' : 'Say what you mean.'}
+          {editing ? <>Rewrite it<span style={{ color: 'var(--accent)' }}>.</span></> : <>Say what you mean<span style={{ color: 'var(--accent)' }}>.</span></>}
         </h1>
         <p style={{ color: 'var(--text)', fontSize: 15, lineHeight: 1.55, maxWidth: '32ch', margin: 0 }}>
           {editing
@@ -122,7 +122,7 @@ export const PostEditor: React.FC<PostEditorProps> = ({ onSuccess }) => {
                 <Button icon={<ClearOutlined />} size="large" onClick={() => form.resetFields()}>
                   Clear
                 </Button>
-                <Button size="large" type="text" onClick={() => navigate('/feed')}>
+                <Button size="large" onClick={() => navigate('/feed')}>
                   Cancel
                 </Button>
               </Space>

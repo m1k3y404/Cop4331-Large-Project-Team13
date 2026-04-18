@@ -49,11 +49,11 @@ const Body: React.FC = () => {
   }, [appliedFilters]);
 
   return (
-    <div style={{ maxWidth: 920, margin: "0 auto", padding: "48px 32px 80px" }}>
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 32px 80px" }}>
       <div className="feed-header">
         <div>
           <span className="feed-kicker">What people wrote</span>
-          <h1>Your feed</h1>
+          <h1>Your Feed<span style={{ color: 'var(--accent)' }}>.</span></h1>
         </div>
         <Space wrap>
           <TiltMenu

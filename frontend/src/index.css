@@ -123,7 +123,7 @@ button:not(:disabled):active,
   color: var(--text);
 }
 .tilt-shell {
-  max-width: 920px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 48px 32px 80px;
   text-align: left;
@@ -213,6 +213,12 @@ button:not(:disabled):active,
   background: #16171d !important;
   border-color: #ef4444 !important;
   color: #ef4444 !important;
+}
+
+/* input character count color */
+.ant-input-data-count,
+.ant-input-textarea-show-count::after, .ant-input-show-count-suffix {
+  color: #9ca3af !important;
 }
 
 /* style AntD primitives to match tilt palette -dechante */

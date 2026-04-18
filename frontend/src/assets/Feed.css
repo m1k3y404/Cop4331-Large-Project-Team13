@@ -14,6 +14,7 @@
   letter-spacing: -1px;
   font-weight: 500;
   line-height: 1;
+  text-align: left;
 }
 
 .feed-kicker {
@@ -23,6 +24,7 @@
   text-transform: uppercase;
   color: var(--text);
   margin: 0 0 8px;
+  text-align: left;
 }
 
 .feed-empty {

@@ -45,7 +45,7 @@ const TiltMenu: React.FC<TiltMenuProps> = ({ appliedFilters, availableLabels, on
   };
 
   const handleAddFilter = (label: string) => {
-    setDraftFilters((current) => [...current, { label, range: [0, 1] }]);
+    setDraftFilters((current) => [...current, { label, range: [0.1, 1] }]); //changed from 0 to 0.1
     setSelectedLabel(undefined);
   };
 
@@ -100,13 +100,14 @@ const TiltMenu: React.FC<TiltMenuProps> = ({ appliedFilters, availableLabels, on
             <Slider
               range
               max={1}
-              min={0}
-              step={0.1}
+              min={0.1} //changed from 0
+              step={0.1} 
               value={filter.range}
               onChange={(value) => handleRangeChange(filter.label, value)}
-            />
-            <Typography.Text type="secondary">
-              {filter.range[0].toFixed(1)} - {filter.range[1].toFixed(1)}
+              tooltip={{ formatter: (value) => `${((value ?? 0) * 10).toFixed(0)}` }} //added this line //3 lines down also added *10 and changed fixed from 1 to 0 
+            /> 
+            <Typography.Text type="secondary"> 
+              {(filter.range[0] * 10).toFixed(0)} - {(filter.range[1] * 10).toFixed(0)}  
             </Typography.Text>
           </Space>
         ))

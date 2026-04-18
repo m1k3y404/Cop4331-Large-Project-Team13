@@ -28,10 +28,6 @@ export default function Navbar() {
   return (
     <nav
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '18px 48px',
         borderBottom: '1px solid var(--border)',
         position: 'sticky',
         top: 0,
@@ -40,6 +36,15 @@ export default function Navbar() {
         zIndex: 10,
       }}
     >
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        maxWidth: 1100,
+        margin: '0 auto',
+        padding: '18px 32px',
+
+      }}>
       <Link to="/" style={{ textDecoration: 'none' }}>
         <Brand size={22} />
       </Link>
@@ -55,6 +60,7 @@ export default function Navbar() {
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         {isAuthed ? (
           <Dropdown
+            placement='bottomRight'
             menu={{
               items: [
                 { key: 'user', label: username ?? 'Account', disabled: true, icon: <UserOutlined /> },
@@ -77,6 +83,7 @@ export default function Navbar() {
             </Link>
           </>
         )}
+        </div>
       </div>
     </nav>
   );
